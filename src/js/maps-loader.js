@@ -1,8 +1,8 @@
 // 📝 Add Google Maps API key here
-window.GOOGLE_MAPS_API_KEY = 'f39143f6af2943898e57538f2d6d3de2';
+window.GOOGLE_MAPS_API_KEY = 'AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk';
 
 // Inject Google Maps script dynamically if API key is set
-if (window.GOOGLE_MAPS_API_KEY && window.GOOGLE_MAPS_API_KEY !== 'f39143f6af2943898e57538f2d6d3de2') {
+if (window.GOOGLE_MAPS_API_KEY && window.GOOGLE_MAPS_API_KEY !== 'AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk') {
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${window.GOOGLE_MAPS_API_KEY}&callback=__initGoogleMaps`;
     script.defer = true;
