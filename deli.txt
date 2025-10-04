@@ -1,21 +1,29 @@
-/history-timeline folder creating
+WDD330-Project-Deli/
 ├── index.html
-├── /css/
-│   └── style.css
-├── /js/
+├──deli.txt
+├── public/
+│   └── events.json
+├── src/
+│   ├── css/
+│   │   └── styles.css
 │   ├── main.js
-│   ├── api.js
-│   ├── timeline.js
-│   ├── eventDetail.js
-│   ├── map.js
-│   ├── favorites.js
-│   └── search.js
-├── /assets/
-│   └── icons/
-│
-└── /data/( for testing)
+│   └── js/
+│       ├── api.mjs
+│       ├── favorites.mjs
+│       ├── search.mjs
+│       ├── map.mjs
+│       ├── maps-loader.mjs
+│       ├── timeline.mjs
+
 
 ***----LINKS----***
 https://trello.com/b/sKZQoORV/history-timeline-interactive-world-history
 invitation to join
 https://trello.com/invite/b/68d7809112d85e804845c84b/ATTIc21ebd2aa98ad97a7eef0745d479a896E0BCCBFE/history-timeline-interactive-world-history
+
+
+
+Task: Created user interface
+Source: https://github.com/Ethem-Deli/WDD330-Project-Deli.git
+Site: https://ethem-deli.github.io/WDD330-Project-Deli/
+Trello Board: https://trello.com/b/sKZQoORV/history-timeline-interactive-world-history

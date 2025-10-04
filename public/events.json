@@ -1,0 +1,47 @@
+[
+    {
+        "title": "Fall of the Western Roman Empire",
+        "year": 476,
+        "decade": 470,
+        "theme": "politics",
+        "location": "Rome, Italy",
+        "description": "The Western Roman Empire fell to the Germanic chieftain Odoacer, marking the end of ancient Rome and the beginning of the Middle Ages.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Sack_of_Rome_410.jpg"
+    },
+    {
+        "title": "Signing of the Magna Carta",
+        "year": 1215,
+        "decade": 1210,
+        "theme": "politics",
+        "location": "Runnymede, England",
+        "description": "King John of England agreed to the Magna Carta, a document that limited royal power and laid the foundation for constitutional government.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Magna_Carta_%28British_Library_Cotton_MS_Augustus_II.106%29.jpg"
+    },
+    {
+        "title": "Industrial Revolution Begins",
+        "year": 1760,
+        "decade": 1760,
+        "theme": "inventions",
+        "location": "Great Britain",
+        "description": "The Industrial Revolution began in Great Britain, transforming manufacturing, transportation, and society.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Powerloom_weaving.jpg"
+    },
+    {
+        "title": "World War I Begins",
+        "year": 1914,
+        "decade": 1910,
+        "theme": "wars",
+        "location": "Europe",
+        "description": "World War I started after the assassination of Archduke Franz Ferdinand, leading to a global conflict involving many major powers.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/1/16/Archduke_Franz_Ferdinand_of_Austria.jpg"
+    },
+    {
+        "title": "Moon Landing",
+        "year": 1969,
+        "decade": 1960,
+        "theme": "inventions",
+        "location": "Moon / USA",
+        "description": "Apollo 11 mission successfully landed humans on the Moon, marking a major milestone in space exploration.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Aldrin_Apollo_11_original.jpg"
+    }
+]

@@ -1,66 +1,81 @@
-import { fetchWikipediaEvents, fetchWikimediaImage } from './api.mjs';
-import { addFavorite } from './favorites.mjs';
-
-// store events in module memory so search/filter can use them
-let ALL_EVENTS = [];
+let eventsData = [];
+let filteredEvents = [];
 
 export async function initTimeline() {
-  // For demo: fetch a sample date. Later you will fetch many events or your own dataset.
-  const events = await fetchWikipediaEvents('October_3');
-  ALL_EVENTS = events;
-  renderTimeline(ALL_EVENTS);
+  await loadEvents();
+  applyFilters(); // initial render
+
+  // Hook up filters
+  document.getElementById('yearRange').addEventListener('input', () => {
+    document.getElementById('yearLabel').textContent = document.getElementById('yearRange').value;
+    applyFilters();
+  });
+
+  document.getElementById('topicFilter').addEventListener('change', applyFilters);
+
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', applyFilters);
 }
 
-export function renderTimeline(events) {
-  const list = document.getElementById('timelineList');
-  list.innerHTML = '';
-  if (!events.length) {
-    list.innerHTML = '<p>No events found.</p>'; return;
+async function loadEvents() {
+  try {
+    const res = await fetch('/events.json');
+    eventsData = await res.json();
+  } catch (err) {
+    console.error('Failed to load events:', err);
+    eventsData = [];
   }
-  events.forEach(ev => {
-    const item = document.createElement('div');
-    item.className = 'timeline-event';
-    item.innerHTML = `<strong>${ev.title}</strong><div class="meta">${ev.year || ''} — ${ev.location || ''}</div>`;
-    item.addEventListener('click', () => showEventDetails(ev));
-    list.appendChild(item);
+}
+
+function applyFilters() {
+  const yearValue = parseInt(document.getElementById('yearRange').value, 10);
+  const topicValue = document.getElementById('topicFilter').value;
+  const searchValue = document.getElementById('searchInput').value.toLowerCase();
+
+  filteredEvents = eventsData.filter(ev => {
+    const matchesYear = Math.abs(ev.year - yearValue) <= 50; // +/- 50 years around selected
+    const matchesTopic = topicValue === 'all' || ev.theme === topicValue;
+    const matchesSearch =
+      ev.title.toLowerCase().includes(searchValue) ||
+      ev.description.toLowerCase().includes(searchValue) ||
+      ev.location.toLowerCase().includes(searchValue);
+
+    return matchesYear && matchesTopic && matchesSearch;
+  });
+
+  renderTimeline();
+}
+
+function renderTimeline() {
+  const container = document.getElementById('timelineList');
+  container.innerHTML = '';
+
+  if (!filteredEvents.length) {
+    container.innerHTML = '<p>No events found.</p>';
+    return;
+  }
+
+  filteredEvents.forEach(event => {
+    const div = document.createElement('div');
+    div.className = 'timeline-event';
+    div.innerHTML = `
+      <strong>${event.year}</strong> — ${event.title}
+    `;
+    div.addEventListener('click', () => showEventDetails(event));
+    container.appendChild(div);
   });
 }
 
-// Exposed function for search + filter in main.js
-export function filterTimelineByQuery() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const topic = document.getElementById('topicFilter').value;
-  const yearVal = parseInt(document.getElementById('yearRange').value, 10);
-
-  let filtered = ALL_EVENTS.filter(e => {
-    const matchesQuery = q ? ((e.title || '').toLowerCase().includes(q) || (e.extract || '').toLowerCase().includes(q)) : true;
-    const matchesTopic = (topic === 'all') ? true : ((e.tags || []).includes(topic) || ((e.category || '') === topic));
-    const matchesYear = !e.year ? true : (Math.abs((e.year) - yearVal) <= 50); // simple proximity filter
-    return matchesQuery && matchesTopic && matchesYear;
-  });
-
-  renderTimeline(filtered);
-}
-
-async function showEventDetails(event) {
-  const el = document.getElementById('detailsContent');
-  el.innerHTML = `<h3>${event.title}</h3><p>${event.extract || ''}</p><p class="meta">Loading image…</p>`;
-  const imgUrl = await fetchWikimediaImage(event.title);
-  let imgHTML = '';
-  if (imgUrl) imgHTML = `<img src="${imgUrl}" alt="${event.title}">`;
-  else if (event.thumbnail) imgHTML = `<img src="${event.thumbnail.source}" alt="${event.title}">`;
-  else imgHTML = `<p><em>No image</em></p>`;
-
-  el.innerHTML = `
+function showEventDetails(event) {
+  const details = document.getElementById('detailsContent');
+  details.innerHTML = `
     <h3>${event.title}</h3>
-    <div class="meta">${event.year || ''} — ${event.location || ''}</div>
-    <div>${event.extract || ''}</div>
-    ${imgHTML}
-    <div style="margin-top:0.5rem;">
-      <button id="addToFav">Add to Favorites</button>
-    </div>
+    <p><strong>Year:</strong> ${event.year}</p>
+    <p><strong>Theme:</strong> ${event.theme}</p>
+    <p>${event.description}</p>
+    <img src="${event.image}" alt="${event.title}" style="max-width:100%;border-radius:8px;margin-top:10px;">
   `;
-  document.getElementById('addToFav').addEventListener('click', () => addFavorite(event));
-  // If map has geocode capability, center map here:
-  if (window.__centerMapOn) window.__centerMapOn(event);
+}
+export function filterTimelineByQuery() {
+  applyFilters();
 }
