@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Ethem Deli's Top 10 Book of Mormon Chapters">
+    <meta name="author" content="Ethem Deli">
+    <title>Interactive World History Timeline</title>
+    <!-- Google Fonts for proposal identity -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Roboto:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="/src/css/styles.css">
+</head>
+
+<body>
+    <header class="site-header">
+        <h1 class="brand">⏳ History Timeline — Interactive World History</h1>
+
+        <div class="controls-row">
+            <input id="searchInput" type="search" placeholder="Search events, people, or places..." />
+            <select id="topicFilter">
+                <option value="all">All topics</option>
+                <option value="wars">Wars</option>
+                <option value="culture">Culture</option>
+                <option value="inventions">Inventions</option>
+                <option value="politics">Politics</option>
+            </select>
+
+            <div class="zoom-controls">
+                <label for="yearRange">Year range</label>
+                <input id="yearRange" type="range" min="-2000" max="2025" value="1900" />
+                <span id="yearLabel">1900</span>
+            </div>
+
+            <button id="shareFavoritesBtn" title="Create shareable link of your favorites">Share Favorites</button>
+            <button id="exportFavoritesBtn" title="Download favorites JSON">Export</button>
+            <button id="clearCacheBtn" title="Clear Wikimedia image cache">Clear Image Cache</button>
+        </div>
+    </header>
+
+    <main class="main-grid">
+        <section id="leftCol" class="left-col">
+            <div id="dailyFact" class="card small-card"></div>
+
+            <section id="timeline" class="card timeline-card">
+                <h2>Timeline</h2>
+                <div id="timelineList"></div>
+            </section>
+
+            <section id="favorites" class="card small-card">
+                <h2>Your Timeline (Favorites)</h2>
+                <ul id="favoritesList" class="favorites-list"></ul>
+            </section>
+        </section>
+
+        <aside id="rightCol" class="right-col">
+            <section id="eventDetails" class="card">
+                <h2>Event Details</h2>
+                <div id="detailsContent">Click an event to see details</div>
+            </section>
+
+            <section id="map" class="card map-card">
+                <h2>Map</h2>
+                <div id="mapCanvas">Map will load here</div>
+            </section>
+        </aside>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 Ethem Deli — Interactive World History Timeline</p>
+    </footer>
+
+    <!-- Google Maps loader (externalized) -->
+    <script type="module" src="/src/js/maps-loader.js"></script>
+    <!--  Main application script -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

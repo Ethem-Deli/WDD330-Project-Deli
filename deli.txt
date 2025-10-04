@@ -1,0 +1,21 @@
+/history-timeline folder creating
+├── index.html
+├── /css/
+│   └── style.css
+├── /js/
+│   ├── main.js
+│   ├── api.js
+│   ├── timeline.js
+│   ├── eventDetail.js
+│   ├── map.js
+│   ├── favorites.js
+│   └── search.js
+├── /assets/
+│   └── icons/
+│
+└── /data/( for testing)
+
+***----LINKS----***
+https://trello.com/b/sKZQoORV/history-timeline-interactive-world-history
+invitation to join
+https://trello.com/invite/b/68d7809112d85e804845c84b/ATTIc21ebd2aa98ad97a7eef0745d479a896E0BCCBFE/history-timeline-interactive-world-history
