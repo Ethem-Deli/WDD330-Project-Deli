@@ -36,7 +36,7 @@ function createMap() {
             addMarker(event.coords.lat, event.coords.lng, event.title);
         } else if (event?.location) {
             // try geocoding location string if API key present
-            if (!window.GOOGLE_MAPS_API_KEY || window.GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY') {
+            if (!window.GOOGLE_MAPS_API_KEY || window.GOOGLE_MAPS_API_KEY === 'AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk') {
                 console.warn('No Maps API key available — cannot geocode location automatically');
                 return;
             }
