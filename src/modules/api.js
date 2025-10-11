@@ -1,9 +1,8 @@
 // Helper module to fetch events, images, and coordinates from Wikipedia / Wikimedia
-
 const WIKI_API_BASE = 'https://en.wikipedia.org/w/api.php';
 
 // low-level helper
-async function wikiQuery(params) {
+export async function wikiQuery(params) {
     const url = new URL(WIKI_API_BASE);
     params.format = 'json';
     params.origin = '*';
@@ -89,7 +88,7 @@ export async function fetchEvents(query) {
                 pageid: sr.id,
                 title: sr.title,
                 description: info.extract || sr.snippet || '',
-                image: info.thumbnail || './src/assests/logo.png', // fallback image
+                image: info.thumbnail || './src/assets/logo.png', // fallback image
                 lat: info.coordinates ? info.coordinates.lat : null,
                 lng: info.coordinates ? info.coordinates.lon : null
             };

@@ -1,7 +1,15 @@
-// Handles Firebase + local fallback authentication logic
+// ============================
+// 🔐 Firebase + Local Fallback Auth
+// ============================
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut }
-    from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import {
+    getAuth,
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 // ============================
 // 🔧 Firebase Configuration
@@ -22,24 +30,44 @@ const auth = getAuth(app);
 // ============================
 // 🧩 Firebase Auth Helpers
 // ============================
-export function loginUser(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
+
+// 🔹 Login existing user
+export async function loginUser(email, password) {
+    const res = await signInWithEmailAndPassword(auth, email, password);
+    if (res.user?.email) {
+        localStorage.setItem("currentUser", res.user.email);
+    }
+    return res;
 }
 
-export function registerUser(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
+// 🔹 Register new user
+export async function registerUser(email, password) {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    if (res.user?.email) {
+        localStorage.setItem("currentUser", res.user.email);
+    }
+    return res;
 }
 
-export function logoutUser() {
-    return signOut(auth);
+// 🔹 Logout user
+export async function logoutUser() {
+    await signOut(auth);
+    localStorage.removeItem("currentUser");
 }
 
+// 🔹 Watch auth state (Firebase)
 export function observeAuthState(callback) {
     onAuthStateChanged(auth, (user) => {
+        if (user?.email) {
+            localStorage.setItem("currentUser", user.email);
+        } else {
+            localStorage.removeItem("currentUser");
+        }
         callback(user);
     });
 }
 
+// 🔹 Require login (redirect if not)
 export function requireAuth(redirectTo = "login.html") {
     onAuthStateChanged(auth, (user) => {
         if (!user) {
@@ -52,7 +80,7 @@ export function requireAuth(redirectTo = "login.html") {
 export { auth };
 
 // ============================
-// 💾 Local Fallback (no server)
+// 💾 Local Fallback (Offline Mode)
 // ============================
 function _localUsersKey() { return "local_users_v1"; }
 function _getLocalUsers() {
@@ -71,18 +99,18 @@ async function tryServer(url, payload) {
         if (!res.ok) throw new Error(data.message || "Server error");
         return data;
     } catch (err) {
-        console.warn("Server auth failed, falling back to local:", err);
+        console.warn("Server auth failed, using local fallback:", err);
         return null;
     }
 }
 
 // ============================
-// 🧾 Form Handling
+// 🧾 Form Handling (optional for auth.html)
 // ============================
 const registerForm = document.getElementById("registerForm");
 const loginForm = document.getElementById("loginForm");
 
-// Registration form
+// Registration (local fallback)
 if (registerForm) {
     registerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -102,14 +130,15 @@ if (registerForm) {
             alert("Email already registered (local)");
             return;
         }
+
         users.push({ name, email, password });
         _saveLocalUsers(users);
-        alert("Registered (local fallback). You can login now.");
+        alert("Registered (local fallback). You can now log in.");
         window.location.href = "/auth/login.html";
     });
 }
 
-// Login form
+// Login (local fallback)
 if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -119,6 +148,7 @@ if (loginForm) {
         const serverData = await tryServer("/api/auth/login", { email, password });
         if (serverData && serverData.token) {
             localStorage.setItem("token", serverData.token);
+            localStorage.setItem("currentUser", email);
             alert("Logged in (server)");
             window.location.href = "/index.html";
             return;
@@ -132,6 +162,7 @@ if (loginForm) {
         }
 
         localStorage.setItem("local_user", JSON.stringify({ name: u.name, email: u.email }));
+        localStorage.setItem("currentUser", u.email);
         alert("Logged in (local)");
         window.location.href = "/index.html";
     });

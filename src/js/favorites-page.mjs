@@ -1,16 +1,49 @@
 // src/js/favorites-page.mjs
 import { loadTemplateWithFallback } from "./main-fallback.mjs";
-import { getFavoritesForCurrentUser, saveFavoritesForCurrentUser } from "./favorites.mjs";
+import {
+    getFavoritesForCurrentUser,
+    saveFavoritesForCurrentUser,
+    exportFavoritesAsFile,
+    createShareLink,
+    loadSharedFavoritesFromQuery
+} from "./favorites.mjs";
 import { renderEventCard } from "./timeline-utils.mjs";
 import { shareEventById } from "./share.mjs";
+import { showToast } from "./js/toast.mjs";
 
+
+showToast("Added to favorites ❤️", "success");
+showToast("Removed from favorites ❌", "error");
+
+// --- Toast Notification Utility ---
+function showToast(message, type = "info") {
+    const container = document.getElementById("toastContainer");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    // Animate in
+    requestAnimationFrame(() => toast.classList.add("show"));
+
+    // Auto-remove after 3s
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+}
+
+// 🧭 Initialize page
 (async () => {
-    // Load header/footer templates
     await loadTemplateWithFallback("/src/partials/header.html", "#header-placeholder");
     await loadTemplateWithFallback("/src/partials/footer.html", "#footer-placeholder");
 
     const favoritesList = document.getElementById("favoritesList");
     const favEmpty = document.getElementById("fav-empty");
+
+    // Load shared favorites if present in query
+    loadSharedFavoritesFromQuery();
+
     let favorites = getFavoritesForCurrentUser();
 
     function renderFavorites() {
@@ -24,6 +57,17 @@ import { shareEventById } from "./share.mjs";
     }
 
     renderFavorites();
+
+    // Export / Share buttons
+    document.getElementById("exportFavoritesBtn").addEventListener("click", () => {
+        exportFavoritesAsFile();
+        showToast("Favorites exported successfully!", "success");
+    });
+
+    document.getElementById("shareFavoritesBtn").addEventListener("click", async () => {
+        await createShareLink();
+        showToast("Share link copied to clipboard!", "info");
+    });
 
     // Handle card buttons
     favoritesList.addEventListener("click", async (e) => {
@@ -44,14 +88,15 @@ import { shareEventById } from "./share.mjs";
             favorites = favorites.filter(f => f.id != eventId);
             saveFavoritesForCurrentUser(favorites);
             renderFavorites();
+            showToast("Removed from favorites ❌", "error");
             return;
         }
 
-        // 🗺️ Open event modal
+        // 🗺️ Open modal
         openEventModal(eventData);
     });
 
-    // Close modal handler
+    // Close modal
     document.getElementById("closeModal").addEventListener("click", () => {
         document.getElementById("eventModal").classList.add("hidden");
     });
@@ -65,7 +110,6 @@ function openEventModal(eventData) {
     document.getElementById("modalImage").src = eventData.image || "./src/assets/placeholder.png";
     modal.classList.remove("hidden");
 
-    // Delay map init slightly for smoother render
     setTimeout(() => {
         const mapContainer = document.getElementById("modalMap");
         if (window.google && eventData.lat && eventData.lng) {

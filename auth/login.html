@@ -4,21 +4,22 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | History Timeline</title>
+    <title>Login / Register | History Timeline</title>
     <link rel="stylesheet" href="auth.css" />
 </head>
 
 <body>
     <main class="auth-container">
-        <h2>Login or Register</h2>
+        <h2 id="authTitle">Login</h2>
 
-        <input type="email" id="email" placeholder="Email" />
-        <input type="password" id="password" placeholder="Password" />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button id="authBtn">Login</button>
 
-        <div class="auth-buttons">
-            <button id="loginBtn">Login</button>
-            <button id="registerBtn">Register</button>
-        </div>
+        <p id="toggleText">
+            Don’t have an account?
+            <a href="#" id="toggleMode">Register</a>
+        </p>
 
         <p id="authMessage" class="message"></p>
     </main>
@@ -26,30 +27,42 @@
     <script type="module">
         import { loginUser, registerUser, observeAuthState } from "./auth.js";
 
+        let mode = "login";
         const emailInput = document.getElementById("email");
         const passwordInput = document.getElementById("password");
+        const authBtn = document.getElementById("authBtn");
         const message = document.getElementById("authMessage");
+        const toggle = document.getElementById("toggleMode");
+        const title = document.getElementById("authTitle");
 
-        document.getElementById("loginBtn").addEventListener("click", async () => {
+        toggle.addEventListener("click", e => {
+            e.preventDefault();
+            mode = mode === "login" ? "register" : "login";
+            title.textContent = mode === "login" ? "Login" : "Register";
+            authBtn.textContent = mode === "login" ? "Login" : "Register";
+            toggle.textContent = mode === "login" ? "Register" : "Login";
+            message.textContent = "";
+        });
+
+        authBtn.addEventListener("click", async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            if (!email || !password) return (message.textContent = "Please fill in all fields.");
+
             try {
-                await loginUser(emailInput.value, passwordInput.value);
-                message.textContent = "Login successful!";
-                window.location.href = "../index.html";
+                if (mode === "login") {
+                    await loginUser(email, password);
+                    localStorage.setItem("currentUser", email);
+                    window.location.href = "../index.html";
+                } else {
+                    await registerUser(email, password);
+                    message.textContent = "Registration successful! Please log in.";
+                }
             } catch (err) {
                 message.textContent = err.message;
             }
         });
 
-        document.getElementById("registerBtn").addEventListener("click", async () => {
-            try {
-                await registerUser(emailInput.value, passwordInput.value);
-                message.textContent = "Registration successful! You can now log in.";
-            } catch (err) {
-                message.textContent = err.message;
-            }
-        });
-
-        // If user already logged in, redirect
         observeAuthState(user => {
             if (user) window.location.href = "../index.html";
         });

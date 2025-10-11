@@ -1,6 +1,25 @@
-// ✅ src/main.js — clean & fixed version (Modal + Google Maps + Search)
+// ✅ src/main.js — Stable, with working Maps, API integration, and fallbacks
 import { initSearch } from "./js/search.mjs";
 import { initCardAnimations } from "./js/animations.mjs";
+import { fetchEvents } from "./modules/api.js";
+import { showToast } from "./js/toast.mjs";
+
+// ✅ 1. Load Google Maps script before using importLibrary
+function loadGoogleMaps(apiKey) {
+  return new Promise((resolve, reject) => {
+    if (window.google && google.maps) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&loading=async&libraries=maps,marker`;
+    script.async = true;
+    script.defer = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
 
 // --- Template Loader ---
 async function loadTemplate(path, containerId) {
@@ -47,7 +66,7 @@ function renderTimeline(events = []) {
     `
     )
     .join("");
-  // 🪄 Trigger animations after render
+
   initCardAnimations();
 }
 
@@ -73,7 +92,7 @@ function renderFavorites() {
 }
 
 // --- Modal ---
-function openModal(eventData) {
+async function openModal(eventData) {
   const modal = document.getElementById("eventModal");
   const modalTitle = document.getElementById("modalTitle");
   const modalImage = document.getElementById("modalImage");
@@ -85,35 +104,75 @@ function openModal(eventData) {
   modalTitle.textContent = eventData.title;
   modalImage.src = eventData.image;
   modalDescription.textContent = eventData.description;
-  modalMap.innerHTML = ""; // reset old map
+  modalMap.innerHTML = "";
 
   modal.style.display = "block";
 
-  // ✅ Initialize Google Map
-  setTimeout(() => {
-    if (window.google && google.maps) {
-      if (eventData.lat && eventData.lng) {
-        const position = { lat: eventData.lat, lng: eventData.lng };
-        const map = new google.maps.Map(modalMap, {
-          zoom: 5,
-          center: position,
-        });
-        new google.maps.Marker({ position, map, title: eventData.title });
-      } else {
-        modalMap.innerHTML = "<p>Location not available.</p>";
-      }
+  // ✅ Ensure Google Maps API is loaded before using it
+  try {
+    await loadGoogleMaps("AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk");
+
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+    if (eventData.lat && eventData.lng) {
+      const position = { lat: eventData.lat, lng: eventData.lng };
+      const map = new Map(modalMap, {
+        zoom: 5,
+        center: position,
+      });
+      new AdvancedMarkerElement({
+        map,
+        position,
+        title: eventData.title,
+      });
     } else {
-      console.error("❌ Google Maps not loaded yet.");
+      await loadMapForEvent(eventData.title);
     }
-  }, 400);
+  } catch (error) {
+    console.error("Google Maps failed to load:", error);
+    modalMap.innerHTML = "<p>Map could not be loaded.</p>";
+  }
 }
 
-// Close modal on click outside
+// --- Geocode + Map Fallback ---
+async function loadMapForEvent(eventTitle) {
+  const modalMap = document.getElementById("modalMap");
+  if (!modalMap) return;
+
+  try {
+    await loadGoogleMaps("AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk");
+
+    const { Map } = await google.maps.importLibrary("maps");
+    const { Marker } = await google.maps.importLibrary("marker");
+
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+        eventTitle
+      )}&key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk`
+    );
+    const data = await response.json();
+
+    if (data.status === "OK") {
+      const location = data.results[0].geometry.location;
+      const map = new Map(modalMap, {
+        zoom: 5,
+        center: location,
+      });
+      new Marker({ position: location, map });
+    } else {
+      modalMap.innerHTML = "<p>Location not available.</p>";
+    }
+  } catch (error) {
+    console.error("Map load failed:", error);
+    modalMap.innerHTML = "<p>Location not available.</p>";
+  }
+}
+
+// --- Close modal on click outside ---
 window.addEventListener("click", e => {
   const modal = document.getElementById("eventModal");
-  if (e.target === modal) {
-    modal.style.display = "none";
-  }
+  if (e.target === modal) modal.style.display = "none";
 });
 
 // --- Main ---
@@ -122,22 +181,56 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadTemplate("./src/partials/footer.html", "footer-placeholder");
 
   try {
-    const response = await fetch("./data/events.json");
-    const events = await response.json();
+    // 🌍 Ensure Google Maps script loads once at startup
+    await loadGoogleMaps("AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk");
+
+    // 🌍 Fetch dynamic events from Wikipedia/Wikimedia API
+    let events = await fetchEvents("World History");
+    if (!events.length) {
+      const response = await fetch("./data/events.json");
+      events = await response.json();
+    }
+
+    // ✅ Add fallback events
+    const fallbackEvents = [
+      {
+        id: 9991,
+        title: "Moon landing",
+        description:
+          "Apollo 11 was the spaceflight that first landed humans on the Moon on July 20, 1969.",
+        image:
+          "https://upload.wikimedia.org/wikipedia/commons/9/9c/Aldrin_Apollo_11.jpg",
+        lat: 0.67408,
+        lng: 23.47297,
+      },
+      {
+        id: 9992,
+        title: "French Revolution",
+        description:
+          "A period of radical social and political upheaval in France from 1789 to 1799.",
+        image:
+          "https://upload.wikimedia.org/wikipedia/commons/6/6f/Prise_de_la_Bastille.jpg",
+        lat: 48.8566,
+        lng: 2.3522,
+      },
+    ];
+
+    // ✅ Combine static + dynamic data
+    events = [...fallbackEvents, ...events];
 
     renderTimeline(events);
     renderFavorites();
 
-    // 🔍 Enable search filtering
+    // 🔍 Search Filter
     initSearch(events, renderTimeline);
 
-    // --- Event listeners ---
+    // --- Event Listeners ---
     const timelineList = document.getElementById("timelineList");
     const favoritesList = document.getElementById("favoritesList");
     const modal = document.getElementById("eventModal");
     const closeModal = document.getElementById("closeModal");
 
-    // Timeline click (open modal or toggle favorite)
+    // Timeline click
     timelineList.addEventListener("click", e => {
       const card = e.target.closest(".event-card");
       if (!card) return;
@@ -150,9 +243,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const favs = getFavorites();
         if (isFavorited(id)) {
           saveFavorites(favs.filter(f => f.id !== id));
+          showToast("Removed from favorites ❌", "error");
         } else {
           favs.push(eventData);
           saveFavorites(favs);
+          showToast("Added to favorites ❤️", "success");
         }
         renderTimeline(events);
         renderFavorites();
@@ -174,10 +269,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     closeModal.addEventListener("click", () => (modal.style.display = "none"));
   } catch (err) {
     console.error("Error loading events:", err);
+    showToast("Failed to load events. Please retry later.", "error");
   }
 });
 
-// --- Fallback global init for Google Maps ---
+// --- Google Maps init hook ---
 window.initMap = () => {
-  console.log("Google Maps script loaded.");
+  console.log("Google Maps API initialized asynchronously.");
 };
