@@ -1,4 +1,4 @@
-// ✅ src/main.js — final clean version (no duplicates, local images only)
+// ✅ src/main.js — final clean version (working modal + Google Maps)
 
 // --- Template Loader ---
 async function loadTemplate(path, containerId) {
@@ -35,8 +35,7 @@ function renderTimeline(events = []) {
           <h3>${e.title}</h3>
           <p>${e.description.slice(0, 100)}...</p>
         </div>
-        <button class="favorite-btn ${isFavorited(e.id) ? "active" : ""
-        }" title="Favorite">❤️</button>
+        <button class="favorite-btn ${isFavorited(e.id) ? "active" : ""}" title="Favorite">❤️</button>
       </div>
     `
     )
@@ -64,30 +63,44 @@ function renderFavorites() {
     : `<p>No favorites yet ❤️</p>`;
 }
 
-// --- Modal ---
+// --- Modal (only one version) ---
 function openModal(eventData) {
   const modal = document.getElementById("eventModal");
+  const modalContent = modal.querySelector(".modal-content");
   if (!modal || !eventData) return;
 
-  document.getElementById("modalImage").src = eventData.image;
-  document.getElementById("modalTitle").textContent = eventData.title;
-  document.getElementById("modalDescription").innerHTML = eventData.description;
-  document.getElementById(
-    "modalMap"
-  ).innerHTML = `<div id="event-map" style="width:100%;height:250px;"></div>`;
-  modal.classList.remove("hidden");
+  modalContent.innerHTML = `
+    <h2>${eventData.title}</h2>
+    <p>${eventData.description}</p>
+    <img src="${eventData.image}" alt="${eventData.title}" class="event-detail-image">
+    <div id="map" style="width:100%;height:300px;margin-top:10px;border-radius:8px;"></div>
+  `;
 
-  if (window.google && window.google.maps && eventData.lat && eventData.lng) {
-    const mapContainer = document.getElementById("event-map");
-    const map = new google.maps.Map(mapContainer, {
-      center: { lat: eventData.lat, lng: eventData.lng },
-      zoom: 5,
-    });
-    new google.maps.Marker({
-      position: { lat: eventData.lat, lng: eventData.lng },
-      map,
-    });
-  }
+  modal.style.display = "block";
+
+  // ✅ Initialize Google Maps after modal is visible
+  setTimeout(() => {
+    if (window.google && google.maps) {
+      if (eventData.lat && eventData.lng) {
+        const position = { lat: eventData.lat, lng: eventData.lng };
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 5,
+          center: position,
+        });
+
+        new google.maps.Marker({
+          position,
+          map,
+          title: eventData.title,
+        });
+      } else {
+        console.warn("⚠️ Event missing lat/lng:", eventData.title);
+        document.getElementById("map").innerHTML = "<p>Location not available.</p>";
+      }
+    } else {
+      console.error("❌ Google Maps not loaded yet.");
+    }
+  }, 600);
 }
 
 // --- Main ---
@@ -142,8 +155,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Close modal
-    closeModal.addEventListener("click", () => modal.classList.add("hidden"));
+    closeModal.addEventListener("click", () => (modal.style.display = "none"));
   } catch (err) {
     console.error("Error loading events:", err);
   }
 });
+
+// --- Fallback global init for Google Maps ---
+window.initMap = () => {
+  console.log("Google Maps script loaded.");
+};
