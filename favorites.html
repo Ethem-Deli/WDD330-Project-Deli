@@ -1,0 +1,69 @@
+<!-- favorites.html -->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Timeline (Favorites) — History Timeline</title>
+    <link rel="stylesheet" href="./src/css/styles.css" />
+    <script type="module">
+        import { requireAuth } from "./auth/auth.js";
+        requireAuth("auth/login.html");
+    </script>
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <h1>My Timeline — Saved Events</h1>
+        <section id="favoritesTimeline" class="timeline-container">
+            <div id="fav-empty" style="display:none; padding:2rem;">
+                <p>No saved events yet. Browse the <a href="./index.html">timeline</a> and save events you like.</p>
+            </div>
+            <div id="favoritesList" class="timeline-list"></div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+    <!-- Load share module so inline favorites script can call window.shareEventById -->
+    <script type="module" src="./src/modules/share.js"></script>
+    <script type="module">
+        import { loadTemplateWithFallback } from "./src/js/main-fallback.mjs";
+        import { getFavoritesForCurrentUser } from "./src/js/favorites.mjs";
+        import { renderEventCard } from "./src/js/timeline-utils.mjs";
+        import { shareEventById } from "./src/js/share.mjs";
+
+        (async () => {
+            await loadTemplateWithFallback("/src/partials/header.html", "#header-placeholder");
+            await loadTemplateWithFallback("/src/partials/footer.html", "#footer-placeholder");
+
+            const favs = getFavoritesForCurrentUser();
+            const favoritesList = document.getElementById("favoritesList");
+            const favEmpty = document.getElementById("fav-empty");
+
+            if (!favs || favs.length === 0) {
+                favEmpty.style.display = "block";
+                return;
+            }
+            favEmpty.style.display = "none";
+
+            favs.forEach(ev => {
+                const card = renderEventCard(ev);
+                favoritesList.appendChild(card);
+            });
+
+            // delegated share handler inside favorites page
+            favoritesList.addEventListener("click", async (e) => {
+                const btn = e.target.closest("[data-action='share']");
+                if (!btn) return;
+                const id = btn.dataset.eventId;
+                await shareEventById(id);
+            });
+
+        })();
+    </script>
+</body>
+
+</html>

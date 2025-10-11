@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register / Login</title>
+    <link rel="stylesheet" href="../src/css/styles.css" />
+</head>
+
+<body>
+    <div class="auth-container">
+        <h1>Welcome to Global Recipe Explorer</h1>
+
+        <div class="auth-forms">
+            <form id="register-form">
+                <h2>Register</h2>
+                <input type="text" id="reg-name" placeholder="Name" required />
+                <input type="email" id="reg-email" placeholder="Email" required />
+                <input type="password" id="reg-password" placeholder="Password" required />
+                <button type="submit">Register</button>
+            </form>
+
+            <form id="login-form">
+                <h2>Login</h2>
+                <input type="email" id="login-email" placeholder="Email" required />
+                <input type="password" id="login-password" placeholder="Password" required />
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <p id="auth-message"></p>
+    </div>
+
+    <script type="module" src="../src/js/auth.mjs"></script>
+</body>
+
+</html>

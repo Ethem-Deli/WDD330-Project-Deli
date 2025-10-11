@@ -1,0 +1,32 @@
+<!-- favorites.html -->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Timeline (Favorites) — History Timeline</title>
+  <script type="module" crossorigin src="/assets/favorites-BoFTu0LY.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/auth-BQFiyjEa.js">
+  <link rel="stylesheet" crossorigin href="/assets/styles-DKXR6HeX.css">
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="container">
+        <h1>My Timeline — Saved Events</h1>
+        <section id="favoritesTimeline" class="timeline-container">
+            <div id="fav-empty" style="display:none; padding:2rem;">
+                <p>No saved events yet. Browse the <a href="./index.html">timeline</a> and save events you like.</p>
+            </div>
+            <div id="favoritesList" class="timeline-list"></div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+    <!-- Load share module so inline favorites script can call window.shareEventById -->
+</body>
+
+</html>

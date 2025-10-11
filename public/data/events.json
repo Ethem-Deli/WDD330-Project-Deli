@@ -1,0 +1,26 @@
+[
+    {
+        "title": "World War II Begins",
+        "year": 1939,
+        "theme": "wars",
+        "location": "Europe",
+        "description": "World War II reshaped the world dramatically.",
+        "searchTerm": "World War II"
+    },
+    {
+        "title": "Moon Landing",
+        "year": 1969,
+        "theme": "inventions",
+        "location": "Moon / USA",
+        "description": "Apollo 11 was the first crewed mission to land on the Moon in 1969.",
+        "searchTerm": "Apollo 11 Moon landing"
+    },
+    {
+        "title": "Printing Press Invented",
+        "year": 1440,
+        "theme": "inventions",
+        "location": "Mainz, Germany",
+        "description": "Gutenberg's printing press revolutionized knowledge distribution.",
+        "searchTerm": "Gutenberg printing press"
+    }
+]

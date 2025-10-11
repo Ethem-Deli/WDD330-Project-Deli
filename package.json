@@ -1,0 +1,37 @@
+{
+    "name": "wdd330-project-deli",
+    "version": "1.0.0",
+    "description": "History Timeline Interactive World History - WDD 330 Project by Ethem Deli",
+    "author": "Ethem Deli",
+    "license": "MIT",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build --emptyOutDir",
+        "preview": "vite preview",
+        "clean": "rimraf dist"
+    },
+    "dependencies": {
+        "firebase": "^11.0.0",
+        "leaflet": "^1.9.4"
+    },
+    "devDependencies": {
+        "eslint": "^9.11.1",
+        "rimraf": "^5.0.5",
+        "vite": "^7.1.9"
+    },
+    "keywords": [
+        "history",
+        "timeline",
+        "interactive",
+        "education",
+        "world-history",
+        "vite",
+        "firebase",
+        "wdd330"
+    ],
+    "engines": {
+        "node": ">=18"
+    }
+}

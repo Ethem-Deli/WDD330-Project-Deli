@@ -1,0 +1,34 @@
+[
+    {
+        "id": "ev1",
+        "title": "Moon Landing",
+        "year": 1969,
+        "theme": "Space",
+        "description": "Apollo 11 lands on the Moon.",
+        "image": "/src/assets/logo.png"
+    },
+    {
+        "id": "ev2",
+        "title": "Fall of Berlin Wall",
+        "year": 1989,
+        "theme": "Politics",
+        "description": "Symbolic end of Cold War divisions.",
+        "image": "/src/assets/logo.png"
+    },
+    {
+        "id": "ev3",
+        "title": "First iPhone",
+        "year": 2007,
+        "theme": "Technology",
+        "description": "Apple releases the first iPhone.",
+        "image": "/src/assets/logo.png"
+    },
+    {
+        "id": "ev4",
+        "title": "First mobile",
+        "year": 2007,
+        "theme": "Technology",
+        "description": "Apple releases the first iPhone.",
+        "image": "/src/assets/logo.png"
+    }
+]
