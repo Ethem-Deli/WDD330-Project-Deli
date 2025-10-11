@@ -1,33 +1,33 @@
 // ✅ Initialize the app after DOM loads
 import { fetchEvents } from './modules/api.js';
 
-// --- Wikimedia Image Fetcher ---
-async function fetchEventImage(searchTerm) {
-    const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(
-        searchTerm
-    )}&gsrlimit=1&prop=imageinfo&iiprop=url|extmetadata&format=json&origin=*`;
+// // --- Wikimedia Image Fetcher ---
+// async function fetchEventImage(searchTerm) {
+//     const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(
+//         searchTerm
+//     )}&gsrlimit=1&prop=imageinfo&iiprop=url|extmetadata&format=json&origin=*`;
 
-    try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
+//     try {
+//         const res = await fetch(apiUrl);
+//         const data = await res.json();
 
-        if (!data.query) {
-            console.warn(`No Wikimedia image found for: ${searchTerm}`);
-            return null;
-        }
+//         if (!data.query) {
+//             console.warn(`No Wikimedia image found for: ${searchTerm}`);
+//             return null;
+//         }
 
-        const page = Object.values(data.query.pages)[0];
-        const imageUrl = page.imageinfo?.[0]?.url;
-        const caption =
-            page.imageinfo?.[0]?.extmetadata?.ImageDescription?.value ||
-            "No description available.";
+//         const page = Object.values(data.query.pages)[0];
+//         const imageUrl = page.imageinfo?.[0]?.url;
+//         const caption =
+//             page.imageinfo?.[0]?.extmetadata?.ImageDescription?.value ||
+//             "No description available.";
 
-        return { imageUrl, caption };
-    } catch (err) {
-        console.error("Error fetching Wikimedia image:", err);
-        return null;
-    }
-}
+//         return { imageUrl, caption };
+//     } catch (err) {
+//         console.error("Error fetching Wikimedia image:", err);
+//         return null;
+//     }
+// }
 
 async function loadTemplate(path, containerId) {
     const container = document.getElementById(containerId);
@@ -70,30 +70,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalDescription = document.getElementById('modalDescription');
     const modalMap = document.getElementById('modalMap');
 
-    // === Example event data ===
-    const events = [
-        {
-            id: 1,
-            title: "Moon Landing",
-            description: "Apollo 11 was the first crewed mission to land on the Moon in 1969.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/9/99/Apollo_11_Lunar_Module_on_the_Moon.jpg",
-            lat: 0, lng: 0
-        },
-        {
-            id: 2,
-            title: "Printing Press Invented",
-            description: "Gutenberg's printing press revolutionized knowledge distribution.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Gutenberg.jpg",
-            lat: 49.9929, lng: 8.2473
-        },
-        {
-            id: 3,
-            title: "World War II Begins",
-            description: "In 1939, WWII began, reshaping the world dramatically.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/5/59/WWII_collage.png",
-            lat: 52.52, lng: 13.405
-        }
-    ];
+    // // === Example event data ===
+    // const events = [
+    //     {
+    //         id: 1,
+    //         title: "Moon Landing",
+    //         description: "Apollo 11 was the first crewed mission to land on the Moon in 1969.",
+    //         image: "https://upload.wikimedia.org/wikipedia/commons/9/99/Apollo_11_Lunar_Module_on_the_Moon.jpg",
+    //         lat: 0, lng: 0
+    //     },
+    //     {
+    //         id: 2,
+    //         title: "Printing Press Invented",
+    //         description: "Gutenberg's printing press revolutionized knowledge distribution.",
+    //         image: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Gutenberg.jpg",
+    //         lat: 49.9929, lng: 8.2473
+    //     },
+    //     {
+    //         id: 3,
+    //         title: "World War II Begins",
+    //         description: "In 1939, WWII began, reshaping the world dramatically.",
+    //         image: "https://upload.wikimedia.org/wikipedia/commons/5/59/WWII_collage.png",
+    //         lat: 52.52, lng: 13.405
+    //     }
+    // ];
 
     // === FAVORITES STORAGE ===
     function getFavorites() {
