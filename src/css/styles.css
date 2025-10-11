@@ -293,3 +293,108 @@ header .logo img {
     height: auto;
     display: block;
 }
+
+/* --- Timeline Layout --- */
+#timelineList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin: 20px;
+    padding: 0;
+}
+
+/* For desktop: 5 columns */
+@media (min-width: 1024px) {
+    #timelineList {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* For mobile: 2 columns */
+@media (max-width: 768px) {
+    #timelineList {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- Event Card --- */
+.event-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* --- Image --- */
+.event-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+
+/* --- Card Body --- */
+.card-body {
+    padding: 12px 14px;
+    flex-grow: 1;
+}
+
+.card-body h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #222;
+}
+
+.card-body p {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* --- Favorite Button --- */
+.favorite-btn {
+    border: none;
+    background: transparent;
+    color: #bbb;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+    align-self: flex-end;
+    padding: 6px 10px;
+}
+
+.favorite-btn.active {
+    color: #e63946;
+}
+
+.favorite-btn:hover {
+    color: #e63946;
+}
+
+/* --- Favorites Section --- */
+#favoritesList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px;
+}
+
+#favoritesList .event-card.small {
+    width: 150px;
+}
+
+.event-image-small {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
