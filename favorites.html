@@ -26,44 +26,23 @@
         </section>
     </main>
 
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal hidden">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDescription"></p>
+            <img id="modalImage" alt="Event image" style="max-width:100%;border-radius:8px;">
+            <div id="modalMap" style="width:100%;height:300px;margin-top:10px;border-radius:8px;"></div>
+        </div>
+    </div>
+
     <div id="footer-placeholder"></div>
-    <!-- Load share module so inline favorites script can call window.shareEventById -->
-    <script type="module" src="./src/modules/share.js"></script>
-    <script type="module">
-        import { loadTemplateWithFallback } from "./src/js/main-fallback.mjs";
-        import { getFavoritesForCurrentUser } from "./src/js/favorites.mjs";
-        import { renderEventCard } from "./src/js/timeline-utils.mjs";
-        import { shareEventById } from "./src/js/share.mjs";
 
-        (async () => {
-            await loadTemplateWithFallback("/src/partials/header.html", "#header-placeholder");
-            await loadTemplateWithFallback("/src/partials/footer.html", "#footer-placeholder");
-
-            const favs = getFavoritesForCurrentUser();
-            const favoritesList = document.getElementById("favoritesList");
-            const favEmpty = document.getElementById("fav-empty");
-
-            if (!favs || favs.length === 0) {
-                favEmpty.style.display = "block";
-                return;
-            }
-            favEmpty.style.display = "none";
-
-            favs.forEach(ev => {
-                const card = renderEventCard(ev);
-                favoritesList.appendChild(card);
-            });
-
-            // delegated share handler inside favorites page
-            favoritesList.addEventListener("click", async (e) => {
-                const btn = e.target.closest("[data-action='share']");
-                if (!btn) return;
-                const id = btn.dataset.eventId;
-                await shareEventById(id);
-            });
-
-        })();
-    </script>
+    <!-- Modules -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk" async
+        defer></script>
+    <script type="module" src="./src/js/favorites-page.mjs"></script>
 </body>
 
 </html>

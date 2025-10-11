@@ -1,16 +1,19 @@
 // src/js/animations.mjs
-export function initRevealOnScroll(root = document) {
-    const items = Array.from(root.querySelectorAll(".reveal"));
-    if (!items.length) return;
+export function initCardAnimations() {
+    const cards = document.querySelectorAll(".event-card");
+    if (!cards.length) return;
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.12 });
+    const observer = new IntersectionObserver(
+        (entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("animate-in");
+                    obs.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.2 } // trigger when 20% visible
+    );
 
-    items.forEach(i => observer.observe(i));
+    cards.forEach(card => observer.observe(card));
 }

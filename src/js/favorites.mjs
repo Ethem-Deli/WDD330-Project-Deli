@@ -1,96 +1,56 @@
-// favorites module
-export function loadFavorites() {
-    const list = document.getElementById('favoritesList');
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    if (!favorites.length) {
-        list.innerHTML = '<li><em>No favorites yet</em></li>';
-        return;
-    }
-    list.innerHTML = favorites.map((f, i) =>
-        `<li data-i="${i}">${f.title || f.name} <button data-i="${i}" class="removeFavBtn">Remove</button></li>`
-    ).join('');
-    list.querySelectorAll('.removeFavBtn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const idx = parseInt(e.target.dataset.i, 10);
-            removeFavorite(idx);
-        });
-    });
-}
+// src/js/favorites.mjs
 
-export function addFavorite(event) {
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    if (!favorites.find(f => f.title === event.title)) {
-        favorites.push(event);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-        loadFavorites();
-        alert('Added to favorites');
-    } else {
-        alert('Already in favorites');
+// 🔹 Get favorites for the logged-in user (or guest)
+export function getFavoritesForCurrentUser() {
+    try {
+        const user = localStorage.getItem("currentUser") || "guest";
+        const key = `favorites_${user}`;
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : [];
+    } catch (err) {
+        console.error("❌ Failed to load favorites:", err);
+        return [];
     }
 }
 
-function removeFavorite(idx) {
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    favorites.splice(idx, 1);
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-    loadFavorites();
+// 🔹 Save favorites for the current user
+export function saveFavoritesForCurrentUser(favs) {
+    const user = localStorage.getItem("currentUser") || "guest";
+    const key = `favorites_${user}`;
+    localStorage.setItem(key, JSON.stringify(favs));
 }
 
+// 🔹 Export favorites to JSON file
 export function exportFavoritesAsFile() {
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    const blob = new Blob([JSON.stringify(favorites, null, 2)], { type: 'application/json' });
+    const favs = getFavoritesForCurrentUser();
+    const blob = new Blob([JSON.stringify(favs, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'favorites-timeline.json';
+    a.download = "favorites-timeline.json";
     a.click();
     URL.revokeObjectURL(url);
 }
 
-// Create a shareable link with favorites encoded in URL (base64)
+// 🔹 Create shareable link (base64 encoded)
 export function createShareLink() {
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(favorites))));
-    const url = `${location.origin}${location.pathname}?shared=${payload}`;
-    navigator.clipboard.writeText(url).then(() => {
-        alert('Share URL copied to clipboard');
-    });
+    const favs = getFavoritesForCurrentUser();
+    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(favs))));
+    const shareUrl = `${location.origin}${location.pathname}?shared=${payload}`;
+    navigator.clipboard.writeText(shareUrl).then(() => alert("Share URL copied to clipboard"));
 }
 
-// If page loaded with ?shared=..., decode and load into favorites (call on page load if needed)
+// 🔹 Load favorites from ?shared= query parameter
 export function loadSharedFavoritesFromQuery() {
     const params = new URLSearchParams(location.search);
-    if (params.has('shared')) {
-        try {
-            const payload = decodeURIComponent(escape(atob(params.get('shared'))));
-            const arr = JSON.parse(payload);
-            localStorage.setItem('favorites', JSON.stringify(arr));
-            loadFavorites();
-        } catch (err) {
-            console.error('Failed to load shared favorites', err);
-        }
-    }
-}
+    if (!params.has("shared")) return;
 
-// ✅ Correctly exported function for favorites retrieval
-export function getFavoritesForCurrentUser() {
     try {
-        const user = localStorage.getItem("currentUser");
-        if (!user) {
-            console.warn("⚠️ No user logged in — returning empty favorites list.");
-            return [];
-        }
-
-        const favoritesKey = `favorites_${user}`;
-        const storedFavorites = localStorage.getItem(favoritesKey);
-
-        if (!storedFavorites) return [];
-
-        const favorites = JSON.parse(storedFavorites);
-        console.info(`✅ Loaded ${favorites.length} favorites for ${user}.`);
-        return favorites;
-    } catch (error) {
-        console.error("❌ Failed to load favorites:", error);
-        return [];
+        const payload = decodeURIComponent(escape(atob(params.get("shared"))));
+        const imported = JSON.parse(payload);
+        saveFavoritesForCurrentUser(imported);
+        alert("Imported shared favorites!");
+    } catch (err) {
+        console.error("❌ Failed to import shared favorites:", err);
     }
 }

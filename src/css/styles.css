@@ -474,3 +474,26 @@ header .logo img {
         transform: translateY(0);
     }
 }
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+}
+
+.search-input:focus {
+    outline: 2px solid #3a86ff;
+    background-color: #f7f9ff;
+}
+
+/* --- Timeline Card Animation --- */
+.event-card {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.event-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}

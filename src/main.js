@@ -1,4 +1,6 @@
-// ✅ src/main.js — final clean version (working modal + Google Maps)
+// ✅ src/main.js — clean & fixed version (Modal + Google Maps + Search)
+import { initSearch } from "./js/search.mjs";
+import { initCardAnimations } from "./js/animations.mjs";
 
 // --- Template Loader ---
 async function loadTemplate(path, containerId) {
@@ -26,6 +28,11 @@ function renderTimeline(events = []) {
   const timelineList = document.getElementById("timelineList");
   if (!timelineList) return;
 
+  if (!events || events.length === 0) {
+    timelineList.innerHTML = `<p class="no-results">No events found for your search.</p>`;
+    return;
+  }
+
   timelineList.innerHTML = events
     .map(
       e => `
@@ -40,6 +47,8 @@ function renderTimeline(events = []) {
     `
     )
     .join("");
+  // 🪄 Trigger animations after render
+  initCardAnimations();
 }
 
 function renderFavorites() {
@@ -63,7 +72,7 @@ function renderFavorites() {
     : `<p>No favorites yet ❤️</p>`;
 }
 
-// --- Modal (only one version) ---
+// --- Modal ---
 function openModal(eventData) {
   const modal = document.getElementById("eventModal");
   const modalTitle = document.getElementById("modalTitle");
@@ -98,12 +107,15 @@ function openModal(eventData) {
     }
   }, 400);
 }
+
+// Close modal on click outside
 window.addEventListener("click", e => {
   const modal = document.getElementById("eventModal");
   if (e.target === modal) {
     modal.style.display = "none";
   }
 });
+
 // --- Main ---
 document.addEventListener("DOMContentLoaded", async () => {
   await loadTemplate("./src/partials/header.html", "header-placeholder");
@@ -115,6 +127,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     renderTimeline(events);
     renderFavorites();
+
+    // 🔍 Enable search filtering
+    initSearch(events, renderTimeline);
 
     // --- Event listeners ---
     const timelineList = document.getElementById("timelineList");
