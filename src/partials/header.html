@@ -1,0 +1,26 @@
+<header class="site-header">
+    <link rel="stylesheet" href="../src/css/styles.css">
+    <div class="container header-inner">
+        <a class="logo" href="../index.html" aria-label="Home">
+            <img src="../src/assets/logo.png" alt="History Timeline logo" class="logo-img" />
+            <span class="logo-text">History Timeline — Interactive World History</span>
+        </a>
+
+        <div class="header-controls">
+            <form id="search-form" class="header-search" role="search" onsubmit="return false;">
+                <input id="globalSearch" class="search-input" type="search"
+                    placeholder="Search events, people, places or years..." aria-label="Search events">
+                <button id="searchBtn" class="search-btn" type="button" aria-label="Search">🔎</button>
+            </form>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a href="../index.html">Timeline</a>
+                <a href="../favorites.html" id="favorites-link">My Timeline (Favorites)</a>
+                <a href="../about.html">About</a>
+                <a href="../auth/login.html" id="authLink">Login</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<script type="module" src="../src/js/headerAuth.js"></script>

@@ -1,52 +1,41 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Interactive World Timeline</title>
-    <link rel="stylesheet" href="./src/css/styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>History Timeline</title>
+    <link rel="stylesheet" href="./src/css/styles.css" />
 </head>
 
 <body>
-
-    <!-- ✅ HEADER -->
     <div id="header-placeholder"></div>
 
-    <!-- ✅ TIMELINE -->
-    <section id="timeline" class="timeline-section">
-        <h2>Timeline</h2>
-        <div id="timelineList" class="timeline-list">
-            <!-- Event cards will be injected here -->
-        </div>
-    </section>
+    <main>
+        <section id="timeline">
+            <h2>Timeline</h2>
+            <div id="timelineList" class="timeline-container"></div>
+        </section>
 
-    <!-- ✅ FAVORITES TIMELINE -->
-    <section id="favorites" class="favorites-section">
-        <h2>Your Favorites</h2>
-        <div id="favoritesList" class="favorites-list"></div>
-    </section>
+        <section id="favorites">
+            <h2>Your Favorites</h2>
+            <div id="favoritesList" class="favorites-container"></div>
+        </section>
+    </main>
 
-    <!-- ✅ EVENT DETAIL MODAL -->
-    <div id="eventModal" class="modal hidden">
+    <!-- Modal -->
+    <div id="eventModal" class="hidden modal">
         <div class="modal-content">
             <span id="closeModal" class="close">&times;</span>
-            <div class="modal-image">
-                <img id="modalImage" src="" alt="">
-            </div>
-            <div class="modal-body">
-                <h3 id="modalTitle"></h3>
-                <p id="modalDescription"></p>
-                <div id="modalMap" class="modal-map"></div>
-            </div>
+            <h3 id="modalTitle"></h3>
+            <img id="modalImage" alt="Event image" />
+            <p id="modalDescription"></p>
+            <div id="modalMap"></div>
         </div>
     </div>
-    <div id="map"></div>
+
     <div id="footer-placeholder"></div>
     <script type="module" src="./src/main.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk&callback=initMap"
-        async defer>
-        </script>
 </body>
 
 </html>

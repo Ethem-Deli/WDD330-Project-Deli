@@ -1,5 +1,4 @@
 // src/js/auth.mjs
-
 const regForm = document.getElementById("register-form");
 const loginForm = document.getElementById("login-form");
 const msg = document.getElementById("auth-message");

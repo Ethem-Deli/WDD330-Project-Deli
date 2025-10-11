@@ -1,64 +1,42 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Ethem Deli's project">
-    <meta name="author" content="Ethem Deli">
-    <title>History Timeline Interactive World History</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto&display=swap"
-        rel="stylesheet" />
-  <script type="module" crossorigin src="/assets/main-C3DbvpIw.js"></script>
+    <title>History Timeline</title>
+  <script type="module" crossorigin src="/assets/main-CBqQi6AD.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="stylesheet" crossorigin href="/assets/styles-DKXR6HeX.css">
-</head> 
+  <link rel="stylesheet" crossorigin href="/assets/styles-ByOwYnII.css">
+</head>
 
 <body>
-    <!-- Header Placeholder -->
     <div id="header-placeholder"></div>
 
-    <!-- Main Container -->
-    <main class="main-container">
-        <!-- Timeline Section -->
-        <section id="timeline" class="timeline-section">
-            <h2>Explore World History</h2>
-            <div id="timelineList" class="timeline-list"></div>
+    <main>
+        <section id="timeline">
+            <h2>Timeline</h2>
+            <div id="timelineList" class="timeline-container"></div>
         </section>
 
-        <!-- Event Modal -->
-        <div id="eventModal" class="modal" role="dialog" aria-labelledby="modalTitle"
-            aria-describedby="modalDescription" aria-modal="true" tabindex="-1">
-            <div class="modal-content">
-                <h2 id="modalTitle"></h2>
-                <img id="modalImage" alt="Event image" />
-                <p id="modalDescription"></p>
-                <button id="closeModal" aria-label="Close modal">✖</button>
-                <button id="shareBtn" aria-label="Share this event">🔗 Share</button>
-            </div>
-        </div>
-
-        <!-- Favorites Section -->
-        <section id="favorites" class="favorites-section">
-            <h2>Your Favorite Events</h2>
-            <div id="favoritesList" class="favorites-list"></div>
+        <section id="favorites">
+            <h2>Your Favorites</h2>
+            <div id="favoritesList" class="favorites-container"></div>
         </section>
     </main>
 
-    <!-- Footer Placeholder -->
-    <div id="footer-placeholder"></div>
+    <!-- Modal -->
+    <div id="eventModal" class="hidden modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h3 id="modalTitle"></h3>
+            <img id="modalImage" alt="Event image" />
+            <p id="modalDescription"></p>
+            <div id="modalMap"></div>
+        </div>
+    </div>
 
-    <!-- Scripts -->
-    <script>
-        // set window.__MAPS_KEY__ from host or dev environment
-        window.__MAPS_KEY__ = window.__MAPS_KEY__ || null;
-        if (window.__MAPS_KEY__) {
-            const s = document.createElement("script");
-            s.src = `https://maps.googleapis.com/maps/api/js?key=${window.__MAPS_KEY__}&callback=initMap`;
-            s.async = s.defer = true;
-            document.head.appendChild(s);
-        }
-    </script>
+    <div id="footer-placeholder"></div>
 </body>
 
 </html>

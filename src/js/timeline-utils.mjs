@@ -143,3 +143,5 @@ function renderEventCard(event) {
     </div>
   `;
 }
+
+export { renderEventCard, displayEvents };
