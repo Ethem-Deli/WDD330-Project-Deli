@@ -66,43 +66,44 @@ function renderFavorites() {
 // --- Modal (only one version) ---
 function openModal(eventData) {
   const modal = document.getElementById("eventModal");
-  const modalContent = modal.querySelector(".modal-content");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalImage = document.getElementById("modalImage");
+  const modalDescription = document.getElementById("modalDescription");
+  const modalMap = document.getElementById("modalMap");
+
   if (!modal || !eventData) return;
 
-  modalContent.innerHTML = `
-    <h2>${eventData.title}</h2>
-    <p>${eventData.description}</p>
-    <img src="${eventData.image}" alt="${eventData.title}" class="event-detail-image">
-    <div id="map" style="width:100%;height:300px;margin-top:10px;border-radius:8px;"></div>
-  `;
+  modalTitle.textContent = eventData.title;
+  modalImage.src = eventData.image;
+  modalDescription.textContent = eventData.description;
+  modalMap.innerHTML = ""; // reset old map
 
   modal.style.display = "block";
 
-  // ✅ Initialize Google Maps after modal is visible
+  // ✅ Initialize Google Map
   setTimeout(() => {
     if (window.google && google.maps) {
       if (eventData.lat && eventData.lng) {
         const position = { lat: eventData.lat, lng: eventData.lng };
-        const map = new google.maps.Map(document.getElementById("map"), {
+        const map = new google.maps.Map(modalMap, {
           zoom: 5,
           center: position,
         });
-
-        new google.maps.Marker({
-          position,
-          map,
-          title: eventData.title,
-        });
+        new google.maps.Marker({ position, map, title: eventData.title });
       } else {
-        console.warn("⚠️ Event missing lat/lng:", eventData.title);
-        document.getElementById("map").innerHTML = "<p>Location not available.</p>";
+        modalMap.innerHTML = "<p>Location not available.</p>";
       }
     } else {
       console.error("❌ Google Maps not loaded yet.");
     }
-  }, 600);
+  }, 400);
 }
-
+window.addEventListener("click", e => {
+  const modal = document.getElementById("eventModal");
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
+});
 // --- Main ---
 document.addEventListener("DOMContentLoaded", async () => {
   await loadTemplate("./src/partials/header.html", "header-placeholder");
