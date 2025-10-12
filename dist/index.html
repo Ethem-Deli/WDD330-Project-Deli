@@ -5,16 +5,43 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>History Timeline</title>
-  <script type="module" crossorigin src="/assets/main-D-c-ZJUU.js"></script>
+  <script type="module" crossorigin src="/assets/main-Dv1TVgXI.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/assets/favorites-JPAmtfbB.js">
-  <link rel="stylesheet" crossorigin href="/assets/favorites-DC2YrEMs.css">
+  <link rel="modulepreload" crossorigin href="/assets/favorites-fSuJaKJR.js">
+  <link rel="stylesheet" crossorigin href="/assets/favorites-DeD2g5pe.css">
 </head>
 
 <body>
     <div id="header-placeholder"></div>
 
     <main>
+        <!-- 🔽 Timeline Filters -->
+        <section id="timelineFilters" class="filters">
+            <label>Filter by Year:
+                <select id="filterYear">
+                    <option value="all">All</option>
+                </select>
+            </label>
+        
+            <label>Filter by Decade:
+                <select id="filterDecade">
+                    <option value="all">All</option>
+                    <option value="1960">1960s</option>
+                    <option value="1970">1970s</option>
+                    <option value="1780">1780s</option>
+                    <option value="1900">1900s</option>
+                </select>
+            </label>
+        
+            <label>Filter by Theme:
+                <select id="filterTheme">
+                    <option value="all">All</option>
+                    <option value="space">Space Exploration</option>
+                    <option value="revolution">Revolutions</option>
+                    <option value="war">Wars</option>
+                </select>
+            </label>
+        </section>
         <section id="timeline">
             <h2>Timeline</h2>
             <div id="timelineList" class="timeline-container"></div>

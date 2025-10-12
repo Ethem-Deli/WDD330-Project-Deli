@@ -1,4 +1,4 @@
-// ✅ src/main.js — with Share Links (Phase 18, Fixed + Complete)
+// ✅ src/main.js — Phases 10–19 Complete & Cleaned
 import { initSearch } from "./js/search.mjs";
 import { initCardAnimations } from "./js/animations.mjs";
 import { fetchEvents } from "./modules/api.js";
@@ -107,7 +107,7 @@ function renderFavorites(favs = []) {
       : `<p>No favorites yet ❤️</p>`}
   `;
 
-  // 🆕 Add export/share handlers
+  // 🆕 Export / Share
   document.getElementById("exportFavsBtn").onclick = exportFavoritesAsFile;
   document.getElementById("shareFavsBtn").onclick = async () => {
     await createShareLink();
@@ -163,7 +163,12 @@ async function openModal(eventData) {
     const lng = eventData.lng;
     if (lat && lng) {
       const map = new Map(modalMap, { zoom: 5, center: { lat, lng } });
-      new AdvancedMarkerElement({ map, position: { lat, lng }, title: eventData.title });
+      new AdvancedMarkerElement({
+        map,
+        position: { lat, lng },
+        title: eventData.title
+      });
+
       const link = document.createElement("a");
       link.href = `https://www.google.com/maps?q=${lat},${lng}`;
       link.target = "_blank";
@@ -177,7 +182,7 @@ async function openModal(eventData) {
     modalMap.innerHTML = "<p>Map could not be loaded.</p>";
   }
 
-  // 🆕 Add share button inside modal
+  // 🆕 Share button inside modal
   modalFooter.innerHTML = `
     <button id="shareEventBtn" class="btn-small">🔗 Share this event</button>
   `;
@@ -207,13 +212,114 @@ function loadSharedEventLink() {
 }
 
 /* -------------------------
+   🧭 TIMELINE FILTERS (Phase 19)
+-------------------------- */
+
+// 🔹 Auto-detect themes
+function detectTheme(event) {
+  const text = (event.title + " " + event.description).toLowerCase();
+  if (text.includes("war")) return "war";
+  if (text.includes("revolution")) return "revolution";
+  if (
+    text.includes("flight") ||
+    text.includes("moon") ||
+    text.includes("internet") ||
+    text.includes("industrial")
+  )
+    return "technology";
+  if (text.includes("discovery") || text.includes("exploration"))
+    return "exploration";
+  return "general";
+}
+
+// 🔹 Populate dropdowns
+function populateFilters(events) {
+  const yearSel = document.getElementById("filterYear");
+  const decadeSel = document.getElementById("filterDecade");
+  const themeSel = document.getElementById("filterTheme");
+  if (!yearSel || !decadeSel || !themeSel) return;
+
+  // Years
+  const years = [...new Set(events.map(e => e.year).filter(Boolean))].sort((a, b) => a - b);
+  years.forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    yearSel.appendChild(opt);
+  });
+
+  // Decades
+  const decades = [...new Set(events.map(e => Math.floor(e.year / 10) * 10))].sort((a, b) => a - b);
+  decades.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = `${d}s`;
+    decadeSel.appendChild(opt);
+  });
+
+  // Themes
+  const themes = [...new Set(events.map(e => e.theme))];
+  themes.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t;
+    opt.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+    themeSel.appendChild(opt);
+  });
+}
+
+// 🔹 Apply filters
+function applyFilters() {
+  const yearSel = document.getElementById("filterYear")?.value || "all";
+  const decadeSel = document.getElementById("filterDecade")?.value || "all";
+  const themeSel = document.getElementById("filterTheme")?.value || "all";
+
+  let filtered = [...allEvents];
+
+  if (yearSel !== "all") {
+    filtered = filtered.filter(e => e.year == yearSel);
+  } else if (decadeSel !== "all") {
+    const start = parseInt(decadeSel);
+    filtered = filtered.filter(e => e.year >= start && e.year < start + 10);
+  }
+
+  if (themeSel !== "all") {
+    filtered = filtered.filter(e => e.theme === themeSel);
+  }
+
+  renderTimeline(filtered);
+}
+
+// 🔹 Setup filters
+function setupFilters(events) {
+  events.forEach(e => {
+    if (!e.theme) e.theme = detectTheme(e);
+  });
+  populateFilters(events);
+
+  document.getElementById("filterYear").addEventListener("change", applyFilters);
+  document.getElementById("filterDecade").addEventListener("change", applyFilters);
+  document.getElementById("filterTheme").addEventListener("change", applyFilters);
+}
+// 🧹 Clear Filters Function
+function clearFilters() {
+  document.getElementById("filterYear").value = "all";
+  document.getElementById("filterDecade").value = "all";
+  document.getElementById("filterTheme").value = "all";
+  renderTimeline(allEvents);
+  showToast("Filters cleared ✨", "success");
+}
+
+// 🧭 Add Clear Filter Button Listener
+document.getElementById("clearFiltersBtn")?.addEventListener("click", clearFilters);
+
+
+/* -------------------------
    MAIN APP LOGIC
 -------------------------- */
 document.addEventListener("DOMContentLoaded", async () => {
   await loadTemplate("./src/partials/header.html", "header-placeholder");
   await loadTemplate("./src/partials/footer.html", "footer-placeholder");
 
-  // 🆕 Load shared favorites (if any)
   await loadSharedFavoritesFromQuery();
 
   observeAuthState(async user => {
@@ -235,21 +341,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         title: "Moon landing",
         description: "Apollo 11 was the first manned Moon landing in 1969.",
         image: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Aldrin_Apollo_11.jpg",
-        lat: 0.67408, lng: 23.47297
+        lat: 0.67408, lng: 23.47297, year: 1969, theme: "technology"
       },
       {
         id: 9992,
         title: "French Revolution",
         description: "A major political upheaval in France (1789–1799).",
         image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Prise_de_la_Bastille.jpg",
-        lat: 48.8566, lng: 2.3522
+        lat: 48.8566, lng: 2.3522, year: 1789, theme: "revolution"
       }
     ];
 
     allEvents = [...fallback, ...events];
     renderTimeline(allEvents);
+    setupFilters(allEvents); // 🧭 Initialize filters
 
-    // Auto-open shared event (if link contains ?event=)
     const sharedEvent = loadSharedEventLink();
     if (sharedEvent) openModal(sharedEvent);
 
@@ -260,7 +366,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const modal = document.getElementById("eventModal");
     const close = document.getElementById("closeModal");
 
-    // Timeline clicks
+    // Timeline click
     list.addEventListener("click", async e => {
       const card = e.target.closest(".event-card");
       if (!card) return;
@@ -284,7 +390,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (event) openModal(event);
     });
 
-    // Close modal
     close.addEventListener("click", () => (modal.style.display = "none"));
   } catch (err) {
     console.error("Error:", err);
@@ -293,7 +398,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* -------------------------
-   GOOGLE MAPS HOOK
+   GOOGLE MAPS INIT HOOK
 -------------------------- */
 window.initMap = () => {
   console.log("✅ Google Maps API initialized.");
