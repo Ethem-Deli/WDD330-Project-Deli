@@ -5,43 +5,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>History Timeline</title>
-  <script type="module" crossorigin src="/assets/main-Dv1TVgXI.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/assets/favorites-fSuJaKJR.js">
-  <link rel="stylesheet" crossorigin href="/assets/favorites-DeD2g5pe.css">
+  <script type="module" crossorigin src="/WDD330-Project-Deli/assets/main-BYk_bBnE.js"></script>
+  <link rel="modulepreload" crossorigin href="/WDD330-Project-Deli/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/WDD330-Project-Deli/assets/favorites-Crj0hubu.js">
+  <link rel="stylesheet" crossorigin href="/WDD330-Project-Deli/assets/favorites-NylS_lkw.css">
 </head>
 
 <body>
     <div id="header-placeholder"></div>
-
+    
     <main>
-        <!-- 🔽 Timeline Filters -->
-        <section id="timelineFilters" class="filters">
-            <label>Filter by Year:
-                <select id="filterYear">
-                    <option value="all">All</option>
-                </select>
-            </label>
+        <div class="filter-bar">
+            <label class="filter-label" for="filterYear">Year</label>
+            <select id="filterYear">
+                <option value="all">All Years</option>
+            </select>
         
-            <label>Filter by Decade:
-                <select id="filterDecade">
-                    <option value="all">All</option>
-                    <option value="1960">1960s</option>
-                    <option value="1970">1970s</option>
-                    <option value="1780">1780s</option>
-                    <option value="1900">1900s</option>
-                </select>
-            </label>
+            <label class="filter-label" for="filterDecade">Decade</label>
+            <select id="filterDecade">
+                <option value="all">All Decades</option>
+                <option value="1960">1960s</option>
+                <option value="1970">1970s</option>
+                <option value="1780">1780s</option>
+                <option value="1900">1900s</option>
+            </select>
         
-            <label>Filter by Theme:
-                <select id="filterTheme">
-                    <option value="all">All</option>
-                    <option value="space">Space Exploration</option>
-                    <option value="revolution">Revolutions</option>
-                    <option value="war">Wars</option>
-                </select>
-            </label>
-        </section>
+            <label class="filter-label" for="filterTheme">Theme</label>
+            <select id="filterTheme">
+                <option value="all">All Themes</option>
+                <option value="all">All</option>
+                <option value="space">Space Exploration</option>
+                <option value="revolution">Revolutions</option>
+                <option value="war">Wars</option>
+            </select>
+            <button id="clearFiltersBtn" class="clear-filters-btn">🧹 Clear</button>
+        </div>
+
         <section id="timeline">
             <h2>Timeline</h2>
             <div id="timelineList" class="timeline-container"></div>

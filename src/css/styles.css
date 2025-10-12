@@ -754,3 +754,60 @@ header .logo img {
         width: 100%;
     }
 }
+/* Filters unique style */
+.filters-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: linear-gradient(90deg, rgba(11, 92, 255, 0.04), rgba(0, 210, 255, 0.02));
+    padding: 10px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(4, 9, 30, 0.04);
+    margin: 16px 20px;
+}
+
+.filters-row select {
+    border: 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(9, 10, 14, 0.03);
+    min-width: 120px;
+}
+
+.btn-small {
+    background: linear-gradient(180deg, #0b5cff, #0652d4);
+    color: #fff;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: .9rem;
+}
+
+.btn-small:hover {
+    transform: translateY(-2px);
+}
+
+/* modal footer */
+.modal-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+/* small favorites header */
+.favorites-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.fav-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}

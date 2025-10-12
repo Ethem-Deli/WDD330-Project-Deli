@@ -1,9 +1,8 @@
-// src/js/firebase-config.mjs firebase configurations for authorizations
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+// ✅ src/js/firebase-config.mjs
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// <-- your firebase config (keep same values you already had)
 const firebaseConfig = {
     apiKey: "AIzaSyB92OXlJn50jta9IHuY5czC937HMgYH2xs",
     authDomain: "historytimeline-wdd330.firebaseapp.com",
@@ -14,9 +13,9 @@ const firebaseConfig = {
     measurementId: "G-GV6LHVLN1R"
 };
 
-const app = initializeApp(firebaseConfig);
+// 🧠 Prevent reinitialization if app already exists
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-// exports
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export default app;

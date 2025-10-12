@@ -71,30 +71,45 @@ export async function getPagesInfo(pageids = []) {
  * @param {string} query
  * @returns {Promise<Array<{id,title,description,image,lat,lng,pageid}>>}
  */
-export async function fetchEvents(query) {
+// ✅ Robust Wikipedia + Wikimedia event fetch
+export async function fetchEvents(topic = "World History") {
     try {
-        const searchResults = await searchEvents(query, 12);
-        if (!searchResults.length) return [];
+        const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages|extracts&exintro&explaintext&pithumbsize=500&generator=search&gsrsearch=${encodeURIComponent(topic)}&gsrlimit=15`;
 
-        const pageids = searchResults.map(r => r.id);
-        const pagesInfo = await getPagesInfo(pageids);
+        const res = await fetch(searchUrl);
+        const data = await res.json();
+        if (!data.query) return [];
 
-        // assemble results
-        return searchResults.map(sr => {
-            const pid = String(sr.id);
-            const info = pagesInfo[pid] || {};
-            return {
-                id: sr.id,
-                pageid: sr.id,
-                title: sr.title,
-                description: info.extract || sr.snippet || '',
-                image: info.thumbnail || './src/assets/logo.png', // fallback image
-                lat: info.coordinates ? info.coordinates.lat : null,
-                lng: info.coordinates ? info.coordinates.lon : null
-            };
-        });
+        return Object.values(data.query.pages).map((page, i) => ({
+            id: page.pageid || i + 1,
+            title: page.title,
+            description: page.extract
+                ? page.extract.slice(0, 300)
+                : "No description available for this event.",
+            image: page.thumbnail?.source || "./src/assets/placeholder.png",
+            year: detectYearFromText(page.extract) || 1900 + i,
+            theme: detectTheme(page.title + " " + page.extract),
+            lat: null,
+            lng: null
+        }));
     } catch (err) {
-        console.error('fetchEvents error', err);
+        console.error("❌ fetchEvents failed:", err);
         return [];
     }
+}
+
+// 🧠 Simple year guess helper
+function detectYearFromText(text = "") {
+    const match = text.match(/\b(1[5-9]\d{2}|20\d{2})\b/);
+    return match ? parseInt(match[0]) : null;
+}
+
+// 🧭 Simple theme classifier
+function detectTheme(text = "") {
+    text = text.toLowerCase();
+    if (text.includes("war")) return "war";
+    if (text.includes("revolution")) return "revolution";
+    if (text.includes("flight") || text.includes("technology") || text.includes("invention")) return "technology";
+    if (text.includes("exploration") || text.includes("discovery")) return "exploration";
+    return "general";
 }

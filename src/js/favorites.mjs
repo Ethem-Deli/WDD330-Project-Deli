@@ -1,18 +1,17 @@
-// ✅ src/js/favorites.mjs
-import { db } from "./firebase-config.mjs";
+// ✅ src/js/favorites.mjs (final modern version)
+import { db, auth } from "./firebase-config.mjs";
 import {
     doc,
     getDoc,
     setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-import { auth } from "./firebase-config.mjs";
 
-const LOCAL_FAVS_KEY = "favorites";
+const LOCAL_FAVS_KEY = "favorites_v1";
 
 /* -------------------------
-   LOCAL FALLBACK HELPERS
+   LOCAL STORAGE HELPERS
 -------------------------- */
-export function getLocalFavorites() {
+function getLocalFavorites() {
     try {
         return JSON.parse(localStorage.getItem(LOCAL_FAVS_KEY) || "[]");
     } catch {
@@ -20,113 +19,108 @@ export function getLocalFavorites() {
     }
 }
 
-export function saveLocalFavorites(favs) {
-    localStorage.setItem(LOCAL_FAVS_KEY, JSON.stringify(favs || []));
+function saveLocalFavorites(favs) {
+    try {
+        localStorage.setItem(LOCAL_FAVS_KEY, JSON.stringify(favs || []));
+    } catch (err) {
+        console.error("Failed saving local favorites:", err);
+    }
 }
 
 /* -------------------------
-   FIRESTORE HELPERS
+   FIRESTORE SYNC
 -------------------------- */
-function userFavoritesDocRef(uid) {
-    return doc(db, "users", uid);
-}
-
-/**
- * 🔹 Get favorites (Firestore if logged in, else local)
- */
-export async function getFavoritesForCurrentUser() {
-    const user = auth.currentUser;
-    if (!user) return getLocalFavorites();
-
+async function firebaseGetFavorites() {
     try {
-        const ref = userFavoritesDocRef(user.uid);
+        const user = auth.currentUser;
+        if (!user) return null;
+
+        const ref = doc(db, "favorites", user.uid);
         const snap = await getDoc(ref);
-        if (!snap.exists()) return [];
-        const data = snap.data();
-        return data.favorites || [];
+        return snap.exists() ? snap.data().items || [] : [];
     } catch (err) {
-        console.error("❌ Failed to load favorites from Firestore:", err);
-        return getLocalFavorites();
+        console.warn("firebaseGetFavorites failed:", err);
+        return null;
     }
 }
 
-/**
- * 🔹 Save favorites for current user
- */
-export async function saveFavoritesForCurrentUser(favs = []) {
-    const user = auth.currentUser;
-    if (!user) {
-        saveLocalFavorites(favs);
-        return;
-    }
+async function firebaseSaveFavorites(favs) {
     try {
-        const ref = userFavoritesDocRef(user.uid);
-        await setDoc(ref, { favorites: favs }, { merge: true });
+        const user = auth.currentUser;
+        if (!user) return false;
+
+        const ref = doc(db, "favorites", user.uid);
+        await setDoc(ref, { items: favs }, { merge: true });
+        return true;
     } catch (err) {
-        console.error("❌ Failed to save favorites to Firestore:", err);
-        saveLocalFavorites(favs);
+        console.warn("firebaseSaveFavorites failed:", err);
+        return false;
     }
 }
 
-/**
- * 🔹 Merge local favorites when user logs in
- */
+/* -------------------------
+   PUBLIC API
+-------------------------- */
+export async function getFavoritesForCurrentUser() {
+    const fb = await firebaseGetFavorites();
+    if (Array.isArray(fb)) return fb;
+    return getLocalFavorites();
+}
+
+export async function saveFavoritesForCurrentUser(favs) {
+    const ok = await firebaseSaveFavorites(favs);
+    if (!ok) saveLocalFavorites(favs);
+}
+
 export async function mergeLocalIntoUserFavorites() {
-    const local = getLocalFavorites();
-    if (!local?.length) return;
-
-    const user = auth.currentUser;
-    if (!user) return;
-
     try {
-        const existing = await getFavoritesForCurrentUser();
-        const merged = [...existing];
-        for (const f of local) {
-            if (!merged.find(x => x && x.id === f.id)) merged.push(f);
+        const local = getLocalFavorites();
+        if (!local.length) return;
+        const fb = await firebaseGetFavorites();
+        if (!Array.isArray(fb)) return;
+        const merged = [...fb];
+        for (const item of local) {
+            if (!merged.find(x => x.id === item.id)) merged.push(item);
         }
-        await saveFavoritesForCurrentUser(merged);
+        await firebaseSaveFavorites(merged);
         localStorage.removeItem(LOCAL_FAVS_KEY);
     } catch (err) {
-        console.error("❌ Failed to merge local favorites:", err);
+        console.warn("mergeLocalIntoUserFavorites failed:", err);
     }
 }
 
 /* -------------------------
-   SHARE / EXPORT FEATURES
+   EXPORT & SHARE HELPERS
 -------------------------- */
-
-/** 🔸 Export favorites as JSON file */
-export async function exportFavoritesAsFile() {
-    const favs = await getFavoritesForCurrentUser();
+export function exportFavoritesAsFile() {
+    const favs = getLocalFavorites();
     const blob = new Blob([JSON.stringify(favs, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "favorites-timeline.json";
+    a.download = "favorites.json";
     a.click();
     URL.revokeObjectURL(url);
 }
 
-/** 🔸 Create a base64 share link and copy to clipboard */
 export async function createShareLink() {
-    const favs = await getFavoritesForCurrentUser();
+    const favs = getLocalFavorites();
     const payload = btoa(unescape(encodeURIComponent(JSON.stringify(favs))));
-    const shareUrl = `${location.origin}${location.pathname}?shared=${payload}`;
-    await navigator.clipboard.writeText(shareUrl);
-    alert("✅ Share link copied to clipboard!");
+    const url = `${location.origin}${location.pathname}?shared=${payload}`;
+    await navigator.clipboard.writeText(url);
+    return url;
 }
 
-/** 🔸 Import favorites from ?shared= query parameter */
-export async function loadSharedFavoritesFromQuery() {
+export function loadSharedFavoritesFromQuery() {
     const params = new URLSearchParams(location.search);
-    if (!params.has("shared")) return;
-
+    if (!params.has("shared")) return false;
     try {
         const payload = decodeURIComponent(escape(atob(params.get("shared"))));
         const imported = JSON.parse(payload);
-        await saveFavoritesForCurrentUser(imported);
-        alert("✅ Imported shared favorites!");
+        saveLocalFavorites(imported);
+        return true;
     } catch (err) {
-        console.error("❌ Failed to import shared favorites:", err);
+        console.error("loadSharedFavoritesFromQuery failed:", err);
+        return false;
     }
 }

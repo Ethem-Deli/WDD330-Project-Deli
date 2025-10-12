@@ -1,41 +1,48 @@
-// 📝 Google Maps API key below.
-// ⚠️ Make sure you have restricted this key to your GitHub Pages domain in Google Cloud Console.
-window.GOOGLE_MAPS_API_KEY = 'AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk';
+// ✅ src/js/maps-loader.mjs
+// ensureGoogleMaps(apiKey) - loads Google Maps dynamically and resolves when ready.
 
-/**
- * ✅ Dynamically loads the Google Maps JavaScript API.
- * If no valid key is set, logs a warning instead.
- */
-export function loadGoogleMaps() {
-    // Ensure a valid API key is present
-    if (
-        !window.GOOGLE_MAPS_API_KEY ||
-        window.GOOGLE_MAPS_API_KEY.trim() === '' ||
-        window.GOOGLE_MAPS_API_KEY === 'AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk'
-    ) {
-        console.warn(
-            '⚠️ No valid Google Maps API key set. Map features will be limited until you add your key in src/js/maps-loader.mjs'
-        );
-        return;
-    }
+export function ensureGoogleMaps(apiKey, timeout = 10000) {
+    return new Promise((resolve, reject) => {
+        if (window.google && window.google.maps && window.google.maps.importLibrary) {
+            resolve(window.google);
+            return;
+        }
 
-    // Avoid loading the script multiple times
-    if (document.querySelector('script[data-google-maps]')) {
-        console.info('ℹ️ Google Maps API script already loaded.');
-        return;
-    }
+        // If loader already exists, listen for it
+        const existing = document.querySelector('script[data-google-maps-loader]');
+        if (existing) {
+            existing.addEventListener('load', () => {
+                if (window.google) resolve(window.google);
+                else reject(new Error("Google loaded but window.google missing"));
+            });
+            existing.addEventListener('error', reject);
+            return;
+        }
 
-    // Create and append the script dynamically
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${window.GOOGLE_MAPS_API_KEY}&callback=__initGoogleMaps`;
-    script.defer = true;
-    script.async = true;
-    script.dataset.googleMaps = "true"; // Mark for duplicate detection
-    document.head.appendChild(script);
+        // Create a unique callback
+        const callbackName = "_gmaps_loader_callback_" + Date.now();
+        window[callbackName] = () => {
+            delete window[callbackName];
+            resolve(window.google);
+        };
 
-    console.info('✅ Google Maps API script added to document.');
+        const s = document.createElement('script');
+        s.dataset.googleMapsLoader = "1";
+        s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&callback=${callbackName}&libraries=maps,marker`;
+        s.async = true;
+        s.defer = true;
+        s.onerror = (e) => {
+            delete window[callbackName];
+            reject(e);
+        };
+        document.head.appendChild(s);
+
+        // Fallback timeout
+        setTimeout(() => {
+            if (!window.google) reject(new Error("Google Maps load timeout"));
+        }, timeout);
+    });
 }
 
-window.initMap = function () {
-    console.log("Google Maps initialized safely.");
-};
+// ✅ Compatibility export for old imports
+export { ensureGoogleMaps as loadGoogleMaps };
