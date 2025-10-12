@@ -1,4 +1,4 @@
-import { logoutUser, observeAuthState } from "../auth/auth.js";
+import { observeAuthState, logoutUser } from "./auth.mjs";
 
 document.addEventListener("DOMContentLoaded", () => {
     const authLink = document.getElementById("authLink");
@@ -8,14 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (user) {
             authLink.textContent = "Logout";
             authLink.href = "#";
-            authLink.addEventListener("click", async (e) => {
+            authLink.onclick = async (e) => {
                 e.preventDefault();
                 await logoutUser();
-                window.location.href = "../index.html";
-            });
+                window.location.reload();
+            };
         } else {
             authLink.textContent = "Login";
-            authLink.href = "../auth/login.html";
+            authLink.href = "/auth/login.html";
         }
     });
 });

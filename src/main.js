@@ -1,17 +1,35 @@
-// ✅ src/main.js — Stable, with working Maps, API integration, and fallbacks
+// ✅ src/main.js — with Share Links (Phase 18, Fixed + Complete)
 import { initSearch } from "./js/search.mjs";
 import { initCardAnimations } from "./js/animations.mjs";
 import { fetchEvents } from "./modules/api.js";
 import { showToast } from "./js/toast.mjs";
+import { observeAuthState } from "./js/auth.mjs";
+import {
+  getFavoritesForCurrentUser,
+  saveFavoritesForCurrentUser,
+  mergeLocalIntoUserFavorites,
+  createShareLink,
+  exportFavoritesAsFile,
+  loadSharedFavoritesFromQuery
+} from "./js/favorites.mjs";
 
-// ✅ 1. Load Google Maps script before using importLibrary
-function loadGoogleMaps(apiKey) {
+let currentUser = null;
+let allEvents = [];
+
+/* -------------------------
+   GOOGLE MAPS LOADER
+-------------------------- */
+async function loadGoogleMaps(apiKey) {
+  if (window.google && google.maps) return;
   return new Promise((resolve, reject) => {
-    if (window.google && google.maps) {
-      resolve();
+    const existing = document.querySelector("script[data-google-maps]");
+    if (existing) {
+      existing.onload = resolve;
+      existing.onerror = reject;
       return;
     }
     const script = document.createElement("script");
+    script.dataset.googleMaps = "true";
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&loading=async&libraries=maps,marker`;
     script.async = true;
     script.defer = true;
@@ -21,7 +39,9 @@ function loadGoogleMaps(apiKey) {
   });
 }
 
-// --- Template Loader ---
+/* -------------------------
+   TEMPLATE LOADER
+-------------------------- */
 async function loadTemplate(path, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -29,20 +49,9 @@ async function loadTemplate(path, containerId) {
   container.innerHTML = await res.text();
 }
 
-// --- Favorites Management ---
-function getFavorites() {
-  return JSON.parse(localStorage.getItem("favorites")) || [];
-}
-
-function saveFavorites(favs) {
-  localStorage.setItem("favorites", JSON.stringify(favs));
-}
-
-function isFavorited(id) {
-  return getFavorites().some(f => f.id === id);
-}
-
-// --- Rendering ---
+/* -------------------------
+   TIMELINE RENDERER
+-------------------------- */
 function renderTimeline(events = []) {
   const timelineList = document.getElementById("timelineList");
   if (!timelineList) return;
@@ -61,7 +70,7 @@ function renderTimeline(events = []) {
           <h3>${e.title}</h3>
           <p>${e.description.slice(0, 100)}...</p>
         </div>
-        <button class="favorite-btn ${isFavorited(e.id) ? "active" : ""}" title="Favorite">❤️</button>
+        <button class="favorite-btn" title="Favorite">❤️</button>
       </div>
     `
     )
@@ -70,210 +79,222 @@ function renderTimeline(events = []) {
   initCardAnimations();
 }
 
-function renderFavorites() {
-  const favoritesList = document.getElementById("favoritesList");
-  if (!favoritesList) return;
+/* -------------------------
+   FAVORITES RENDERER
+-------------------------- */
+function renderFavorites(favs = []) {
+  const list = document.getElementById("favoritesList");
+  if (!list) return;
 
-  const favs = getFavorites();
-  favoritesList.innerHTML = favs.length
-    ? favs
-      .map(
-        e => `
-        <div class="event-card small" data-id="${e.id}">
-          <img src="${e.image}" alt="${e.title}" class="event-image-small">
-          <div class="card-body">
-            <h4>${e.title}</h4>
-          </div>
-        </div>
-      `
-      )
-      .join("")
-    : `<p>No favorites yet ❤️</p>`;
+  list.innerHTML = `
+    <div class="favorites-header">
+      <h3>Your Favorites</h3>
+      <div class="fav-actions">
+        <button id="exportFavsBtn" class="btn-small">⬇️ Export</button>
+        <button id="shareFavsBtn" class="btn-small">🔗 Share</button>
+      </div>
+    </div>
+    ${favs.length
+      ? favs
+        .map(
+          e => `
+              <div class="event-card small" data-id="${e.id}">
+                <img src="${e.image}" alt="${e.title}" class="event-image-small">
+                <div class="card-body"><h4>${e.title}</h4></div>
+              </div>`
+        )
+        .join("")
+      : `<p>No favorites yet ❤️</p>`}
+  `;
+
+  // 🆕 Add export/share handlers
+  document.getElementById("exportFavsBtn").onclick = exportFavoritesAsFile;
+  document.getElementById("shareFavsBtn").onclick = async () => {
+    await createShareLink();
+    showToast("✅ Share link copied to clipboard!", "success");
+  };
 }
 
-// --- Modal ---
+/* -------------------------
+   FAVORITE TOGGLE
+-------------------------- */
+async function toggleFavorite(eventData) {
+  const favs = await getFavoritesForCurrentUser();
+  const exists = favs.find(f => f.id === eventData.id);
+  if (exists) {
+    const updated = favs.filter(f => f.id !== eventData.id);
+    await saveFavoritesForCurrentUser(updated);
+    showToast("Removed from favorites ❌", "error");
+  } else {
+    favs.push(eventData);
+    await saveFavoritesForCurrentUser(favs);
+    showToast("Added to favorites ❤️", "success");
+  }
+  renderFavorites(await getFavoritesForCurrentUser());
+}
+
+/* -------------------------
+   OPEN MODAL + MAP + SHARE
+-------------------------- */
 async function openModal(eventData) {
   const modal = document.getElementById("eventModal");
   const modalTitle = document.getElementById("modalTitle");
   const modalImage = document.getElementById("modalImage");
   const modalDescription = document.getElementById("modalDescription");
   const modalMap = document.getElementById("modalMap");
+  const modalFooter = document.getElementById("modalFooter");
 
-  if (!modal || !eventData) return;
-
-  modalTitle.textContent = eventData.title;
-  modalImage.src = eventData.image;
-  modalDescription.textContent = eventData.description;
-  modalMap.innerHTML = "";
+  if (!modal) return;
 
   modal.style.display = "block";
+  modalTitle.textContent = eventData.title;
+  modalImage.src = eventData.image || "./src/assets/placeholder.png";
+  modalDescription.textContent =
+    eventData.description || "No description available.";
+  modalMap.innerHTML = "Loading map...";
 
-  // ✅ Ensure Google Maps API is loaded before using it
+  await loadGoogleMaps("AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk");
+
   try {
-    await loadGoogleMaps("AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk");
-
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-    if (eventData.lat && eventData.lng) {
-      const position = { lat: eventData.lat, lng: eventData.lng };
-      const map = new Map(modalMap, {
-        zoom: 5,
-        center: position,
-      });
-      new AdvancedMarkerElement({
-        map,
-        position,
-        title: eventData.title,
-      });
-    } else {
-      await loadMapForEvent(eventData.title);
-    }
-  } catch (error) {
-    console.error("Google Maps failed to load:", error);
-    modalMap.innerHTML = "<p>Map could not be loaded.</p>";
-  }
-}
-
-// --- Geocode + Map Fallback ---
-async function loadMapForEvent(eventTitle) {
-  const modalMap = document.getElementById("modalMap");
-  if (!modalMap) return;
-
-  try {
-    await loadGoogleMaps("AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk");
-
-    const { Map } = await google.maps.importLibrary("maps");
-    const { Marker } = await google.maps.importLibrary("marker");
-
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-        eventTitle
-      )}&key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk`
-    );
-    const data = await response.json();
-
-    if (data.status === "OK") {
-      const location = data.results[0].geometry.location;
-      const map = new Map(modalMap, {
-        zoom: 5,
-        center: location,
-      });
-      new Marker({ position: location, map });
+    const lat = eventData.lat;
+    const lng = eventData.lng;
+    if (lat && lng) {
+      const map = new Map(modalMap, { zoom: 5, center: { lat, lng } });
+      new AdvancedMarkerElement({ map, position: { lat, lng }, title: eventData.title });
+      const link = document.createElement("a");
+      link.href = `https://www.google.com/maps?q=${lat},${lng}`;
+      link.target = "_blank";
+      link.textContent = "📍 View on Google Maps";
+      modalMap.appendChild(link);
     } else {
       modalMap.innerHTML = "<p>Location not available.</p>";
     }
-  } catch (error) {
-    console.error("Map load failed:", error);
-    modalMap.innerHTML = "<p>Location not available.</p>";
+  } catch (err) {
+    console.error("Map error:", err);
+    modalMap.innerHTML = "<p>Map could not be loaded.</p>";
+  }
+
+  // 🆕 Add share button inside modal
+  modalFooter.innerHTML = `
+    <button id="shareEventBtn" class="btn-small">🔗 Share this event</button>
+  `;
+  document.getElementById("shareEventBtn").onclick = () => {
+    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(eventData))));
+    const url = `${location.origin}${location.pathname}?event=${payload}`;
+    navigator.clipboard.writeText(url).then(() => {
+      showToast("✅ Event link copied to clipboard!", "success");
+    });
+  };
+}
+
+/* -------------------------
+   LOAD SHARED EVENT LINK
+-------------------------- */
+function loadSharedEventLink() {
+  const params = new URLSearchParams(location.search);
+  if (!params.has("event")) return null;
+
+  try {
+    const payload = decodeURIComponent(escape(atob(params.get("event"))));
+    return JSON.parse(payload);
+  } catch (err) {
+    console.error("❌ Failed to parse shared event:", err);
+    return null;
   }
 }
 
-// --- Close modal on click outside ---
-window.addEventListener("click", e => {
-  const modal = document.getElementById("eventModal");
-  if (e.target === modal) modal.style.display = "none";
-});
-
-// --- Main ---
+/* -------------------------
+   MAIN APP LOGIC
+-------------------------- */
 document.addEventListener("DOMContentLoaded", async () => {
   await loadTemplate("./src/partials/header.html", "header-placeholder");
   await loadTemplate("./src/partials/footer.html", "footer-placeholder");
 
-  try {
-    // 🌍 Ensure Google Maps script loads once at startup
-    await loadGoogleMaps("AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk");
+  // 🆕 Load shared favorites (if any)
+  await loadSharedFavoritesFromQuery();
 
-    // 🌍 Fetch dynamic events from Wikipedia/Wikimedia API
+  observeAuthState(async user => {
+    currentUser = user;
+    if (user) await mergeLocalIntoUserFavorites();
+    renderFavorites(await getFavoritesForCurrentUser());
+  });
+
+  try {
     let events = await fetchEvents("World History");
     if (!events.length) {
-      const response = await fetch("./data/events.json");
-      events = await response.json();
+      const res = await fetch("./data/events.json");
+      events = await res.json();
     }
 
-    // ✅ Add fallback events
-    const fallbackEvents = [
+    const fallback = [
       {
         id: 9991,
         title: "Moon landing",
-        description:
-          "Apollo 11 was the spaceflight that first landed humans on the Moon on July 20, 1969.",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/9/9c/Aldrin_Apollo_11.jpg",
-        lat: 0.67408,
-        lng: 23.47297,
+        description: "Apollo 11 was the first manned Moon landing in 1969.",
+        image: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Aldrin_Apollo_11.jpg",
+        lat: 0.67408, lng: 23.47297
       },
       {
         id: 9992,
         title: "French Revolution",
-        description:
-          "A period of radical social and political upheaval in France from 1789 to 1799.",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/6/6f/Prise_de_la_Bastille.jpg",
-        lat: 48.8566,
-        lng: 2.3522,
-      },
+        description: "A major political upheaval in France (1789–1799).",
+        image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Prise_de_la_Bastille.jpg",
+        lat: 48.8566, lng: 2.3522
+      }
     ];
 
-    // ✅ Combine static + dynamic data
-    events = [...fallbackEvents, ...events];
+    allEvents = [...fallback, ...events];
+    renderTimeline(allEvents);
 
-    renderTimeline(events);
-    renderFavorites();
+    // Auto-open shared event (if link contains ?event=)
+    const sharedEvent = loadSharedEventLink();
+    if (sharedEvent) openModal(sharedEvent);
 
-    // 🔍 Search Filter
-    initSearch(events, renderTimeline);
+    initSearch(allEvents, renderTimeline);
 
-    // --- Event Listeners ---
-    const timelineList = document.getElementById("timelineList");
-    const favoritesList = document.getElementById("favoritesList");
+    const list = document.getElementById("timelineList");
+    const favList = document.getElementById("favoritesList");
     const modal = document.getElementById("eventModal");
-    const closeModal = document.getElementById("closeModal");
+    const close = document.getElementById("closeModal");
 
-    // Timeline click
-    timelineList.addEventListener("click", e => {
+    // Timeline clicks
+    list.addEventListener("click", async e => {
       const card = e.target.closest(".event-card");
       if (!card) return;
-
-      const id = parseInt(card.dataset.id);
-      const eventData = events.find(ev => ev.id === id);
-      if (!eventData) return;
+      const id = +card.dataset.id;
+      const event = allEvents.find(ev => ev.id === id);
+      if (!event) return;
 
       if (e.target.classList.contains("favorite-btn")) {
-        const favs = getFavorites();
-        if (isFavorited(id)) {
-          saveFavorites(favs.filter(f => f.id !== id));
-          showToast("Removed from favorites ❌", "error");
-        } else {
-          favs.push(eventData);
-          saveFavorites(favs);
-          showToast("Added to favorites ❤️", "success");
-        }
-        renderTimeline(events);
-        renderFavorites();
+        await toggleFavorite(event);
       } else {
-        openModal(eventData);
+        openModal(event);
       }
     });
 
-    // Favorites click (open modal)
-    favoritesList.addEventListener("click", e => {
+    // Favorites click
+    favList.addEventListener("click", e => {
       const card = e.target.closest(".event-card");
       if (!card) return;
-      const id = parseInt(card.dataset.id);
-      const eventData = events.find(ev => ev.id === id);
-      if (eventData) openModal(eventData);
+      const id = +card.dataset.id;
+      const event = allEvents.find(ev => ev.id === id);
+      if (event) openModal(event);
     });
 
     // Close modal
-    closeModal.addEventListener("click", () => (modal.style.display = "none"));
+    close.addEventListener("click", () => (modal.style.display = "none"));
   } catch (err) {
-    console.error("Error loading events:", err);
-    showToast("Failed to load events. Please retry later.", "error");
+    console.error("Error:", err);
+    showToast("Failed to load events.", "error");
   }
 });
 
-// --- Google Maps init hook ---
+/* -------------------------
+   GOOGLE MAPS HOOK
+-------------------------- */
 window.initMap = () => {
-  console.log("Google Maps API initialized asynchronously.");
+  console.log("✅ Google Maps API initialized.");
 };

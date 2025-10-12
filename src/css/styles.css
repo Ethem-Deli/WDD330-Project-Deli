@@ -567,3 +567,32 @@ header .logo img {
     background-color: #f1c40f;
     color: #222;
 }
+.map-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: #0077ff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.map-link:hover {
+    text-decoration: underline;
+}
+.modal-footer {
+    text-align: right;
+    padding: 0.75rem;
+    border-top: 1px solid #ccc;
+}
+
+.btn-small {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    background: #0078ff;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-small:hover {
+    background: #005fcc;
+}

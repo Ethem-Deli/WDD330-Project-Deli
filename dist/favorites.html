@@ -1,4 +1,3 @@
-<!-- favorites.html -->
 <!doctype html>
 <html lang="en">
 
@@ -6,17 +5,24 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>My Timeline (Favorites) — History Timeline</title>
-  <script type="module" crossorigin src="/assets/favorites-P-I7fcZX.js"></script>
+  <script type="module" crossorigin src="/assets/favorites-DVbbFaLo.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/assets/auth-BQFiyjEa.js">
-  <link rel="stylesheet" crossorigin href="/assets/styles-ByOwYnII.css">
+  <link rel="modulepreload" crossorigin href="/assets/favorites-JPAmtfbB.js">
+  <link rel="modulepreload" crossorigin href="/assets/auth-CRiUk8YE.js">
+  <link rel="stylesheet" crossorigin href="/assets/favorites-DC2YrEMs.css">
 </head>
 
 <body>
     <div id="header-placeholder"></div>
 
-    <main class="container">
+    <main class="favorites-page container">
         <h1>My Timeline — Saved Events</h1>
+
+        <div class="favorites-actions">
+            <button id="exportFavoritesBtn">📦 Export Favorites</button>
+            <button id="shareFavoritesBtn">🔗 Share Favorites</button>
+        </div>
+
         <section id="favoritesTimeline" class="timeline-container">
             <div id="fav-empty" style="display:none; padding:2rem;">
                 <p>No saved events yet. Browse the <a href="./index.html">timeline</a> and save events you like.</p>
@@ -25,8 +31,25 @@
         </section>
     </main>
 
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal hidden">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDescription"></p>
+            <img id="modalImage" alt="Event image" style="max-width:100%;border-radius:8px;">
+            <div id="modalMap" style="width:100%;height:300px;margin-top:10px;border-radius:8px;"></div>
+            <div id="modalFooter" class="modal-footer"></div>
+        </div>
+    </div>
+
     <div id="footer-placeholder"></div>
-    <!-- Load share module so inline favorites script can call window.shareEventById -->
+    <!-- Toast Notification -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- Modules -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk" async
+        defer></script>
 </body>
 
 </html>

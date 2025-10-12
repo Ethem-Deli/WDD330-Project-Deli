@@ -5,9 +5,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>History Timeline</title>
-  <script type="module" crossorigin src="/assets/main-CBqQi6AD.js"></script>
+  <script type="module" crossorigin src="/assets/main-D-c-ZJUU.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="stylesheet" crossorigin href="/assets/styles-ByOwYnII.css">
+  <link rel="modulepreload" crossorigin href="/assets/favorites-JPAmtfbB.js">
+  <link rel="stylesheet" crossorigin href="/assets/favorites-DC2YrEMs.css">
 </head>
 
 <body>
@@ -26,17 +27,23 @@
     </main>
 
     <!-- Modal -->
-    <div id="eventModal" class="hidden modal">
+    <div id="eventModal" class="modal">
         <div class="modal-content">
             <span id="closeModal" class="close">&times;</span>
             <h3 id="modalTitle"></h3>
             <img id="modalImage" alt="Event image" />
             <p id="modalDescription"></p>
             <div id="modalMap"></div>
+            <div id="modalFooter" class="modal-footer"></div>
         </div>
     </div>
 
-    <div id="footer-placeholder"></div>
+    <div id="footer-placeholder"></div>
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk" async></script>
+
+    <!-- <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk&callback=initMap"></script> -->
 </body>
 
 </html>

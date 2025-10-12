@@ -9,7 +9,7 @@ import {
 } from "./favorites.mjs";
 import { renderEventCard } from "./timeline-utils.mjs";
 import { shareEventById } from "./share.mjs";
-import { showToast } from "./js/toast.mjs";
+// import { showToast } from "./js/toast.mjs";
 
 
 showToast("Added to favorites ❤️", "success");

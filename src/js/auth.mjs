@@ -1,65 +1,59 @@
-// src/js/auth.mjs
-const regForm = document.getElementById("register-form");
-const loginForm = document.getElementById("login-form");
-const msg = document.getElementById("auth-message");
+// ✅ src/js/auth.mjs
+import { auth } from "./firebase-config.mjs";
+import {
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    GoogleAuthProvider,
+    signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-function saveUsers(users) {
-    localStorage.setItem("users", JSON.stringify(users));
+const LOCAL_USER_KEY = "local_user_v1";
+
+/* -------------------------
+   FIREBASE AUTH
+-------------------------- */
+export function registerUser(email, password) {
+    return createUserWithEmailAndPassword(auth, email, password);
 }
 
-function getUsers() {
-    return JSON.parse(localStorage.getItem("users")) || [];
+export function loginUser(email, password) {
+    return signInWithEmailAndPassword(auth, email, password);
 }
 
-// Register
-if (regForm) {
-    regForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = document.getElementById("reg-name").value.trim();
-        const email = document.getElementById("reg-email").value.trim();
-        const password = document.getElementById("reg-password").value.trim();
-
-        let users = getUsers();
-        if (users.find((u) => u.email === email)) {
-            msg.textContent = "⚠️ Email already registered.";
-            return;
-        }
-
-        users.push({ name, email, password });
-        saveUsers(users);
-        msg.textContent = "✅ Registered successfully! You can log in now.";
-        regForm.reset();
-    });
+export async function loginWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    return signInWithPopup(auth, provider);
 }
 
-// Login
-if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const email = document.getElementById("login-email").value.trim();
-        const password = document.getElementById("login-password").value.trim();
-
-        const users = getUsers();
-        const user = users.find((u) => u.email === email && u.password === password);
-
-        if (user) {
-            localStorage.setItem("loggedUser", JSON.stringify(user));
-            msg.textContent = `👋 Welcome back, ${user.name}! Redirecting...`;
-            setTimeout(() => {
-                window.location.href = "../index.html";
-            }, 1000);
-        } else {
-            msg.textContent = "❌ Invalid email or password.";
-        }
-    });
-}
-
-// Logout helper (for other pages)
 export function logoutUser() {
-    localStorage.removeItem("loggedUser");
-    window.location.href = "../register.html";
+    return signOut(auth);
 }
 
-export function getLoggedUser() {
-    return JSON.parse(localStorage.getItem("loggedUser"));
+export function observeAuthState(cb) {
+    onAuthStateChanged(auth, (user) => cb(user));
+}
+
+export function requireAuth(redirectTo = "/auth/login.html") {
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = redirectTo;
+    });
+}
+
+/* -------------------------
+   LOCAL FALLBACK (optional)
+-------------------------- */
+export function saveLocalUser(userObj) {
+    localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(userObj));
+}
+export function getLocalUser() {
+    try {
+        return JSON.parse(localStorage.getItem(LOCAL_USER_KEY));
+    } catch {
+        return null;
+    }
+}
+export function clearLocalUser() {
+    localStorage.removeItem(LOCAL_USER_KEY);
 }
