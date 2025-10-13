@@ -1,4 +1,4 @@
-// ✅ src/js/auth.mjs
+// src/js/auth.mjs
 import { auth } from "./firebase-config.mjs";
 import {
     onAuthStateChanged,

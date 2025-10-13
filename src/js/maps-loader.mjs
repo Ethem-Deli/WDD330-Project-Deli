@@ -1,4 +1,4 @@
-// ✅ src/js/maps-loader.mjs
+// src/js/maps-loader.mjs
 // ensureGoogleMaps(apiKey) - loads Google Maps dynamically and resolves when ready.
 
 export function ensureGoogleMaps(apiKey, timeout = 10000) {
@@ -44,5 +44,5 @@ export function ensureGoogleMaps(apiKey, timeout = 10000) {
     });
 }
 
-// ✅ Compatibility export for old imports
+// Compatibility export for old imports
 export { ensureGoogleMaps as loadGoogleMaps };

@@ -1,4 +1,4 @@
-// ✅ src/js/favorites.mjs (final modern version)
+// src/js/favorites.mjs
 import { db, auth } from "./firebase-config.mjs";
 import {
     doc,

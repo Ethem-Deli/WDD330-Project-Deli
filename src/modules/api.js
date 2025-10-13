@@ -71,7 +71,7 @@ export async function getPagesInfo(pageids = []) {
  * @param {string} query
  * @returns {Promise<Array<{id,title,description,image,lat,lng,pageid}>>}
  */
-// ✅ Robust Wikipedia + Wikimedia event fetch
+// Robust Wikipedia + Wikimedia event fetch
 export async function fetchEvents(topic = "World History") {
     try {
         const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages|extracts&exintro&explaintext&pithumbsize=500&generator=search&gsrsearch=${encodeURIComponent(topic)}&gsrlimit=15`;

@@ -521,7 +521,7 @@ header .logo img {
     background: #005fa3;
 }
 
-/* ✅ Toast Styles */
+/* Toast Styles */
 .toast-container {
     position: fixed;
     bottom: 20px;
@@ -997,3 +997,83 @@ header .logo img {
         display: flex;
     }
 }   
+/* ==============================================================
+   📘 ABOUT PAGE STYLES
+============================================================== */
+.about-hero {
+    text-align: center;
+    margin: 3rem 0 2rem;
+}
+
+.about-hero h1 {
+    font-size: 2rem;
+    color: #0b5cff;
+    margin-bottom: 1rem;
+}
+
+.about-hero p {
+    max-width: 700px;
+    margin: 0 auto;
+    color: #444;
+    line-height: 1.6;
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.about-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.about-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.about-card h2 {
+    color: #0b5cff;
+    margin-bottom: 0.8rem;
+}
+
+.about-card p,
+.about-card ul {
+    color: #333;
+    line-height: 1.6;
+}
+
+.about-card ul {
+    padding-left: 1.2rem;
+}
+
+.tech-list li {
+    list-style-type: "⚙️ ";
+}
+
+.about-contact {
+    text-align: center;
+    margin: 3rem 0;
+}
+
+.btn-contact {
+    display: inline-block;
+    background: linear-gradient(135deg, #00b4ff, #0078ff);
+    color: white;
+    padding: 0.8rem 1.6rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-contact:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 180, 255, 0.4);
+}

@@ -1,4 +1,4 @@
-// ✅ src/main.js — Final Full Version
+// src/main.js
 import { initSearch } from "./js/search.mjs";
 import { initCardAnimations } from "./js/animations.mjs";
 import { fetchEvents } from "./modules/api.js";
@@ -15,12 +15,8 @@ import {
 import { initHamburgerMenu } from "./js/hamburger.mjs";
 
 /* -------------------------
-   ✅ Initialize after DOM ready
+   Google Maps API Key
 --------------------------*/
-document.addEventListener("DOMContentLoaded", () => {
-  initHamburgerMenu(); // call the external menu setup
-});
-// ✅ Google Maps API Key
 const GMAPS_KEY = "AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk";
 
 let allEvents = [];
@@ -100,7 +96,7 @@ async function renderFavoritesUI() {
   if (shareBtn)
     shareBtn.onclick = async () => {
       await createShareLink();
-      showToast("✅ Share link copied to clipboard!", "success");
+      showToast("Share link copied to clipboard!", "success");
     };
 }
 
@@ -181,7 +177,7 @@ async function openModal(eventData) {
           );
           const url = `${location.origin}${location.pathname}?event=${payload}`;
           navigator.clipboard.writeText(url);
-          showToast("✅ Event link copied to clipboard!", "success");
+          showToast("Event link copied to clipboard!", "success");
         } catch (err) {
           showToast("Failed to create share link", "error");
         }
@@ -191,18 +187,13 @@ async function openModal(eventData) {
 }
 
 /* -------------------------
-   Theme + Filters
+   Filters (Theme / Year / Decade)
 --------------------------*/
 function detectTheme(event) {
   const text = ((event.title || "") + " " + (event.description || "")).toLowerCase();
   if (text.includes("war")) return "war";
   if (text.includes("revolution")) return "revolution";
-  if (
-    text.includes("flight") ||
-    text.includes("moon") ||
-    text.includes("internet") ||
-    text.includes("industrial")
-  )
+  if (text.includes("flight") || text.includes("moon") || text.includes("internet") || text.includes("industrial"))
     return "technology";
   if (text.includes("discovery") || text.includes("exploration"))
     return "exploration";
@@ -219,9 +210,7 @@ function populateFilters(events) {
   decadeSel.innerHTML = `<option value="all">All decades</option>`;
   themeSel.innerHTML = `<option value="all">All themes</option>`;
 
-  const years = [...new Set(events.map((e) => e.year).filter(Boolean))].sort(
-    (a, b) => a - b
-  );
+  const years = [...new Set(events.map((e) => e.year).filter(Boolean))].sort((a, b) => a - b);
   years.forEach((y) => {
     const opt = document.createElement("option");
     opt.value = y;
@@ -230,9 +219,7 @@ function populateFilters(events) {
   });
 
   const decades = [
-    ...new Set(
-      events.map((e) => Math.floor(e.year / 10) * 10).filter((n) => Number.isFinite(n))
-    ),
+    ...new Set(events.map((e) => Math.floor(e.year / 10) * 10).filter((n) => Number.isFinite(n))),
   ].sort((a, b) => a - b);
   decades.forEach((d) => {
     const opt = document.createElement("option");
@@ -312,6 +299,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadTemplate("./src/partials/header.html", "header-placeholder");
   await loadTemplate("./src/partials/footer.html", "footer-placeholder");
 
+  // Initialize hamburger menu AFTER header loads
+  initHamburgerMenu();
+
   loadSharedFavoritesFromQuery();
 
   try {
@@ -335,8 +325,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         id: 9991,
         title: "Moon Landing",
         description: "Apollo 11 (1969).",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/9/9c/Aldrin_Apollo_11.jpg",
+        image: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Aldrin_Apollo_11.jpg",
         year: 1969,
         lat: 0.67408,
         lng: 23.47297,
@@ -346,8 +335,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         id: 9992,
         title: "French Revolution",
         description: "1789 - 1799.",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/6/6f/Prise_de_la_Bastille.jpg",
+        image: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Prise_de_la_Bastille.jpg",
         year: 1789,
         lat: 48.8566,
         lng: 2.3522,
@@ -370,15 +358,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await renderFavoritesUI();
 
     populateFilters(allEvents);
-    document
-      .getElementById("filterYear")
-      ?.addEventListener("change", applyFilters);
-    document
-      .getElementById("filterDecade")
-      ?.addEventListener("change", applyFilters);
-    document
-      .getElementById("filterTheme")
-      ?.addEventListener("change", applyFilters);
+    document.getElementById("filterYear")?.addEventListener("change", applyFilters);
+    document.getElementById("filterDecade")?.addEventListener("change", applyFilters);
+    document.getElementById("filterTheme")?.addEventListener("change", applyFilters);
 
     const clearBtn = document.getElementById("clearFiltersBtn");
     if (clearBtn) {
@@ -431,4 +413,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     showToast("Failed to load events. See console.", "error");
   }
 });
-
