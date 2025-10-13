@@ -720,6 +720,7 @@ header .logo img {
         background-position: 300% 50%;
     }
 }
+
 /* ------------------------------
    🧹 CLEAR FILTER BUTTON
 ------------------------------ */
@@ -754,6 +755,7 @@ header .logo img {
         width: 100%;
     }
 }
+
 /* Filters unique style */
 .filters-row {
     display: flex;
@@ -811,3 +813,187 @@ header .logo img {
     gap: 8px;
     align-items: center;
 }
+
+/* Header styling */
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1.2rem;
+    background: #0d1b2a;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.2rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+/* Hamburger button */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    color: white;
+    cursor: pointer;
+}
+
+/* Responsive hamburger and menu behavior */
+.hamburger {
+    width: 30px;
+    height: 24px;
+    position: relative;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.hamburger::before,
+.hamburger::after,
+.hamburger span {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background: #333;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.hamburger::before {
+    top: 0;
+}
+
+.hamburger span {
+    top: 10px;
+}
+
+.hamburger::after {
+    bottom: 0;
+}
+
+/* When active, animate into X */
+.hamburger.active::before {
+    transform: rotate(45deg);
+    top: 10px;
+}
+
+.hamburger.active span {
+    opacity: 0;
+}
+
+.hamburger.active::after {
+    transform: rotate(-45deg);
+    bottom: 10px;
+}
+
+/* Mobile menu styles */
+.nav-links {
+    display: flex;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        background: white;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links.open {
+        display: flex;
+    }
+}
+
+/* --- HAMBURGER MENU --- */
+.hamburger {
+    width: 30px;
+    height: 24px;
+    position: relative;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: none;
+    /* Hidden on desktop */
+}
+
+.hamburger::before,
+.hamburger::after,
+.hamburger span {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background: #fff;
+    /* Use white bars to contrast dark header */
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.hamburger::before {
+    top: 0;
+}
+
+.hamburger span {
+    top: 10px;
+}
+
+.hamburger::after {
+    bottom: 0;
+}
+
+.hamburger.active::before {
+    transform: rotate(45deg);
+    top: 10px;
+}
+
+.hamburger.active span {
+    opacity: 0;
+}
+
+.hamburger.active::after {
+    transform: rotate(-45deg);
+    bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+    }
+
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background: #222;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-links.open {
+        display: flex;
+    }
+}   

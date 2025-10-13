@@ -1,75 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A brief description of the web page for SEO.">
+    <meta name="keywords" content="HTML, CSS, JavaScript, Web Development">
+    <meta name="author" content="Ethem Deli">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#ffffff">
+    <meta property="og:title" content="My Web Page">
+    <meta property="og:description" content="This is an example of a meta Open Graph tag.">
+    <meta property="og:image" content="https://example.com/preview.jpg">
+    <meta property="og:url" content="https://example.com">
+
     <title>History Timeline</title>
-  <script type="module" crossorigin src="/WDD330-Project-Deli/assets/main-BYk_bBnE.js"></script>
-  <link rel="modulepreload" crossorigin href="/WDD330-Project-Deli/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/WDD330-Project-Deli/assets/favorites-Crj0hubu.js">
-  <link rel="stylesheet" crossorigin href="/WDD330-Project-Deli/assets/favorites-NylS_lkw.css">
-</head>
+      <script type="module" crossorigin src="/WDD330-Project-Deli/assets/main-CVsMpXH7.js"></script>
+      <link rel="modulepreload" crossorigin href="/WDD330-Project-Deli/assets/modulepreload-polyfill-B5Qt9EMX.js">
+      <link rel="modulepreload" crossorigin href="/WDD330-Project-Deli/assets/favorites-J_X_7SHO.js">
+      <link rel="stylesheet" crossorigin href="/WDD330-Project-Deli/assets/favorites-Bih6RClW.css">
+    </head>
 
-<body>
-    <div id="header-placeholder"></div>
-    
-    <main>
-        <div class="filter-bar">
-            <label class="filter-label" for="filterYear">Year</label>
-            <select id="filterYear">
-                <option value="all">All Years</option>
-            </select>
-        
-            <label class="filter-label" for="filterDecade">Decade</label>
-            <select id="filterDecade">
-                <option value="all">All Decades</option>
-                <option value="1960">1960s</option>
-                <option value="1970">1970s</option>
-                <option value="1780">1780s</option>
-                <option value="1900">1900s</option>
-            </select>
-        
-            <label class="filter-label" for="filterTheme">Theme</label>
-            <select id="filterTheme">
-                <option value="all">All Themes</option>
-                <option value="all">All</option>
-                <option value="space">Space Exploration</option>
-                <option value="revolution">Revolutions</option>
-                <option value="war">Wars</option>
-            </select>
-            <button id="clearFiltersBtn" class="clear-filters-btn">🧹 Clear</button>
+    <body>
+        <div id="header-placeholder"></div>
+
+        <main>
+            <div class="filter-bar">
+                <label class="filter-label" for="filterYear">Year</label>
+                <select id="filterYear">
+                    <option value="all">All Years</option>
+                </select>
+
+                <label class="filter-label" for="filterDecade">Decade</label>
+                <select id="filterDecade">
+                    <option value="all">All Decades</option>
+                    <option value="1960">1960s</option>
+                    <option value="1970">1970s</option>
+                    <option value="1780">1780s</option>
+                    <option value="1900">1900s</option>
+                </select>
+
+                <label class="filter-label" for="filterTheme">Theme</label>
+                <select id="filterTheme">
+                    <option value="all">All Themes</option>
+                    <option value="all">All</option>
+                    <option value="space">Space Exploration</option>
+                    <option value="revolution">Revolutions</option>
+                    <option value="war">Wars</option>
+                </select>
+                <button id="clearFiltersBtn" class="clear-filters-btn">🧹 Clear</button>
+            </div>
+
+            <section id="timeline">
+                <h2>Timeline</h2>
+                <div id="timelineList" class="timeline-container"></div>
+            </section>
+
+            <section id="favorites">
+                <h2>Your Favorites</h2>
+                <div id="favoritesList" class="favorites-container"></div>
+            </section>
+        </main>
+
+        <!-- Modal -->
+        <div id="eventModal" class="modal">
+            <div class="modal-content">
+                <span id="closeModal" class="close">&times;</span>
+                <h3 id="modalTitle"></h3>
+                <img id="modalImage" alt="Event image" />
+                <p id="modalDescription"></p>
+                <div id="modalMap"></div>
+                <div id="modalFooter" class="modal-footer"></div>
+            </div>
         </div>
 
-        <section id="timeline">
-            <h2>Timeline</h2>
-            <div id="timelineList" class="timeline-container"></div>
-        </section>
+        <div id="footer-placeholder"></div>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk"
+            async></script>
 
-        <section id="favorites">
-            <h2>Your Favorites</h2>
-            <div id="favoritesList" class="favorites-container"></div>
-        </section>
-    </main>
-
-    <!-- Modal -->
-    <div id="eventModal" class="modal">
-        <div class="modal-content">
-            <span id="closeModal" class="close">&times;</span>
-            <h3 id="modalTitle"></h3>
-            <img id="modalImage" alt="Event image" />
-            <p id="modalDescription"></p>
-            <div id="modalMap"></div>
-            <div id="modalFooter" class="modal-footer"></div>
-        </div>
-    </div>
-
-    <div id="footer-placeholder"></div>
-    
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk" async></script>
-
-    <!-- <script async defer
+        <!-- <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk&callback=initMap"></script> -->
-</body>
+    </body>
 
 </html>
