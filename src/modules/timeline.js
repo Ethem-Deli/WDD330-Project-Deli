@@ -27,7 +27,7 @@ export function initSearchFilter(events, onFilterChange) {
     themeSelect.innerHTML = `<option value="all">All Themes</option>` +
         themes.map((t) => `<option value="${t}">${t}</option>`).join("");
 
-    // 🔍 Function to apply all filters
+    //Function to apply all filters
     function applyFilters() {
         const yearVal = yearSelect.value;
         const decadeVal = decadeSelect.value;
@@ -45,12 +45,12 @@ export function initSearchFilter(events, onFilterChange) {
         }
     }
 
-    // 🔄 Attach listeners
+    // Attach listeners
     yearSelect.addEventListener("change", applyFilters);
     decadeSelect.addEventListener("change", applyFilters);
     themeSelect.addEventListener("change", applyFilters);
 
-    // 🧹 Clear filters button
+    // Clear filters button
     if (clearBtn) {
         clearBtn.addEventListener("click", () => {
             yearSelect.value = "all";

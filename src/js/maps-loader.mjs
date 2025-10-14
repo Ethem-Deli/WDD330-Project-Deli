@@ -1,5 +1,4 @@
 // src/js/maps-loader.mjs
-// ensureGoogleMaps(apiKey) - loads Google Maps dynamically and resolves when ready.
 
 export function ensureGoogleMaps(apiKey, timeout = 10000) {
     return new Promise((resolve, reject) => {

@@ -1,4 +1,4 @@
-// mediaHelpers.mjs - helpers to fetch Wikipedia summary and Wikimedia images
+// src/js/mediaHelpers.mjs
 export async function fetchWikipediaSummary(title){
   try{
     const q = encodeURIComponent(title);

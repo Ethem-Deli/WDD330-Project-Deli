@@ -1,3 +1,4 @@
+// src/js/timeline.mjs
 let eventsData = [];
 let filteredEvents = [];
 

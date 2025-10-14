@@ -16,9 +16,7 @@ import { initSearchFilter } from "./modules/timeline.js";
 
 window.showToast = showToast;
 
-/* -------------------------
-   Google Maps API Key
---------------------------*/
+//  Google Maps API Key
 const GMAPS_KEY = "AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk";
 let allEvents = [];
 

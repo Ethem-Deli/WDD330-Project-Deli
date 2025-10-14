@@ -1,16 +1,9 @@
 // src/js/favorites-page.mjs
 import { loadTemplateWithFallback } from "./main-fallback.mjs";
-import {
-    getFavoritesForCurrentUser,
-    saveFavoritesForCurrentUser,
-    exportFavoritesAsFile,
-    createShareLink,
-    loadSharedFavoritesFromQuery
-} from "./favorites.mjs";
+import {getFavoritesForCurrentUser,saveFavoritesForCurrentUser,exportFavoritesAsFile, createShareLink, loadSharedFavoritesFromQuery} from "./favorites.mjs";
 import { renderEventCard } from "./timeline-utils.mjs";
 import { shareEventById } from "./share.mjs";
 // import { showToast } from "./js/toast.mjs";
-
 
 showToast("Added to favorites ❤️", "success");
 showToast("Removed from favorites ❌", "error");

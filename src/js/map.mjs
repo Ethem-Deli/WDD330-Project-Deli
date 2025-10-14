@@ -1,4 +1,4 @@
-// map.mjs — simple integration wrapper
+// src/js/map.mjs
 let mapInstance = null;
 let markers = [];
 

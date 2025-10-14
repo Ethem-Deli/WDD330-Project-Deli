@@ -1,4 +1,4 @@
-// Helper module to fetch events, images, and coordinates from Wikipedia / Wikimedia
+// src/modules/api.js Helper module to fetch events, images, and coordinates from Wikipedia / Wikimedia
 const WIKI_API_BASE = "https://en.wikipedia.org/w/api.php";
 
 // Low-level helper
@@ -66,7 +66,7 @@ export async function getPagesInfo(pageids = []) {
 }
 
 /**
- * ✅ Unified event loader with fallback:
+ * Unified event loader with fallback:
  * 1. Try Wikipedia API
  * 2. If it fails or empty, use local events.json
  */
@@ -79,7 +79,7 @@ export async function fetchEvents(topic = "World History") {
         const res = await fetch(wikiUrl);
         const data = await res.json();
 
-        // ✅ Fallback to local JSON if no results
+        //  Fallback to local JSON if no results
         if (!data.query) {
             console.warn("⚠️ No Wikipedia data, falling back to local JSON");
             const local = await fetch("data/events.json");
@@ -87,7 +87,7 @@ export async function fetchEvents(topic = "World History") {
             return await local.json();
         }
 
-        // ✅ Map Wikipedia results
+        // Map Wikipedia results
         return Object.values(data.query.pages).map((page, i) => ({
             id: page.pageid || i + 1,
             title: page.title,
@@ -113,13 +113,13 @@ export async function fetchEvents(topic = "World History") {
     }
 }
 
-// 🧠 Simple year guess helper
+// Simple year guess helper
 function detectYearFromText(text = "") {
     const match = text.match(/\b(1[5-9]\d{2}|20\d{2})\b/);
     return match ? parseInt(match[0]) : null;
 }
 
-// 🧭 Simple theme classifier
+// Simple theme classifier
 function detectTheme(text = "") {
     text = text.toLowerCase();
     if (text.includes("war")) return "war";

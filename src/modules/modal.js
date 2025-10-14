@@ -1,4 +1,4 @@
-// Share button handler for events
+//src/modules/modal.js - Share button handler for events
 export function setupShareButton(eventData) {
     const shareBtn = document.getElementById("shareBtn");
     if (!shareBtn) return;

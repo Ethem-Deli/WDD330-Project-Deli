@@ -13,9 +13,7 @@ function safeToast(message, type = "info") {
 
 const LOCAL_FAVS_KEY = "favorites_v1";
 
-/* -------------------------
-   LOCAL STORAGE HELPERS
--------------------------- */
+//    LOCAL STORAGE HELPERS
 function getLocalFavorites() {
     try {
         return JSON.parse(localStorage.getItem(LOCAL_FAVS_KEY) || "[]");
@@ -32,9 +30,7 @@ function saveLocalFavorites(favs) {
     }
 }
 
-/* -------------------------
-   FIRESTORE SYNC
--------------------------- */
+//    FIRESTORE SYNC
 async function firebaseGetFavorites() {
     try {
         const user = auth.currentUser;
@@ -49,9 +45,7 @@ async function firebaseGetFavorites() {
     }
 }
 
-/* -------------------------
-   PUBLIC API
--------------------------- */
+//    PUBLIC API
 export async function getFavoritesForCurrentUser() {
     const fb = await firebaseGetFavorites();
     if (Array.isArray(fb)) return fb;
@@ -79,9 +73,7 @@ export async function saveFavoritesForCurrentUser(favs) {
     }
 }
 
-/* -------------------------
-   MERGE LOCAL + ONLINE
--------------------------- */
+//    MERGE LOCAL + ONLINE
 export async function mergeLocalIntoUserFavorites() {
     try {
         const local = getLocalFavorites();
@@ -103,9 +95,7 @@ export async function mergeLocalIntoUserFavorites() {
     }
 }
 
-/* -------------------------
-   EXPORT & SHARE HELPERS
--------------------------- */
+//    EXPORT & SHARE HELPERS
 export function exportFavoritesAsFile() {
     const favs = getLocalFavorites();
     const blob = new Blob([JSON.stringify(favs, null, 2)], { type: "application/json" });

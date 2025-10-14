@@ -1,4 +1,4 @@
-// timeline-utils.mjs - renders events, handles filters, favorites, modal, and search
+// src/js/timeline-utils.mjs
 import { fetchWikipediaSummary, fetchWikimediaImage } from "./mediaHelpers.mjs";
 import { loadGoogleMaps } from "./maps-loader.mjs";
 

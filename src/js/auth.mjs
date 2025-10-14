@@ -1,19 +1,14 @@
 // src/js/auth.mjs
 import { auth } from "./firebase-config.mjs";
 import {
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    GoogleAuthProvider,
-    signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+    signOut, GoogleAuthProvider, signInWithPopup
+}
+    from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 const LOCAL_USER_KEY = "local_user_v1";
 
-/* -------------------------
-   AUTH CORE
--------------------------- */
+// Auth Core 
 export function registerUser(email, password) {
     return createUserWithEmailAndPassword(auth, email, password);
 }
@@ -24,7 +19,7 @@ export function loginUser(email, password) {
 
 export async function loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" }); // 🆕 ensures user can pick account
+    provider.setCustomParameters({ prompt: "select_account" });
     return signInWithPopup(auth, provider);
 }
 
@@ -36,18 +31,14 @@ export function observeAuthState(callback) {
     onAuthStateChanged(auth, (user) => callback(user));
 }
 
-/* -------------------------
-   ACCESS CONTROL
--------------------------- */
+//    ACCESS CONTROL
 export function requireAuth(redirectTo = "/auth/login.html") {
     onAuthStateChanged(auth, (user) => {
         if (!user) window.location.href = redirectTo;
     });
 }
 
-/* -------------------------
-   LOCAL FALLBACK
--------------------------- */
+// LOCAL FALLBACK
 export function saveLocalUser(user) {
     localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(user));
 }

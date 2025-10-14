@@ -1,6 +1,4 @@
 // src/modules/share.js
-// Provides shareEventById and attaches it to window for pages that use it.
-
 export async function shareEventById(eventId) {
     try {
         // Try to find event in favorites or on the page
