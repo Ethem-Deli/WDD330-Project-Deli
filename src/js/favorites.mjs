@@ -6,6 +6,8 @@ import {
     setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
+const showToast = window.showToast || ((msg) => alert(msg));
+
 const LOCAL_FAVS_KEY = "favorites_v1";
 
 /* -------------------------
@@ -44,20 +46,6 @@ async function firebaseGetFavorites() {
     }
 }
 
-async function firebaseSaveFavorites(favs) {
-    try {
-        const user = auth.currentUser;
-        if (!user) return false;
-
-        const ref = doc(db, "favorites", user.uid);
-        await setDoc(ref, { items: favs }, { merge: true });
-        return true;
-    } catch (err) {
-        console.warn("firebaseSaveFavorites failed:", err);
-        return false;
-    }
-}
-
 /* -------------------------
    PUBLIC API
 -------------------------- */
@@ -68,9 +56,28 @@ export async function getFavoritesForCurrentUser() {
 }
 
 export async function saveFavoritesForCurrentUser(favs) {
-    const ok = await firebaseSaveFavorites(favs);
-    if (!ok) saveLocalFavorites(favs);
+    try {
+        const user = auth.currentUser;
+        saveLocalFavorites(favs); // Always save locally first
+
+        if (user) {
+            try {
+                const ref = doc(db, "favorites", user.uid);
+                await setDoc(ref, { items: favs }, { merge: true });
+                showToast("✅ Synced to your online favorites!", "success");
+            } catch (err) {
+                console.warn("Firestore save failed, falling back to local only:", err);
+                showToast("⚠️ Saved locally (offline mode)", "info");
+            }
+        } else {
+            showToast("⭐ Saved locally (login to sync!)", "info");
+        }
+    } catch (err) {
+        console.error("Error saving favorites:", err);
+        showToast("❌ Failed to save favorite.", "error");
+    }
 }
+
 
 export async function mergeLocalIntoUserFavorites() {
     try {
@@ -82,8 +89,12 @@ export async function mergeLocalIntoUserFavorites() {
         for (const item of local) {
             if (!merged.find(x => x.id === item.id)) merged.push(item);
         }
-        await firebaseSaveFavorites(merged);
-        localStorage.removeItem(LOCAL_FAVS_KEY);
+        const user = auth.currentUser;
+        if (user) {
+            const ref = doc(db, "favorites", user.uid);
+            await setDoc(ref, { items: merged }, { merge: true });
+            localStorage.removeItem(LOCAL_FAVS_KEY);
+        }
     } catch (err) {
         console.warn("mergeLocalIntoUserFavorites failed:", err);
     }
@@ -108,6 +119,7 @@ export async function createShareLink() {
     const payload = btoa(unescape(encodeURIComponent(JSON.stringify(favs))));
     const url = `${location.origin}${location.pathname}?shared=${payload}`;
     await navigator.clipboard.writeText(url);
+    showToast("📋 Share link copied to clipboard!");
     return url;
 }
 
@@ -118,9 +130,11 @@ export function loadSharedFavoritesFromQuery() {
         const payload = decodeURIComponent(escape(atob(params.get("shared"))));
         const imported = JSON.parse(payload);
         saveLocalFavorites(imported);
+        showToast("✅ Imported shared favorites!");
         return true;
     } catch (err) {
         console.error("loadSharedFavoritesFromQuery failed:", err);
+        showToast("❌ Failed to import shared favorites.");
         return false;
     }
 }

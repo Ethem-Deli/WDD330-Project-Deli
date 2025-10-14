@@ -1,81 +1,241 @@
-/* Auth pagestyles */
+/* ============================================================
+   🧭 Modern Historical Auth Page
+   Clean minimal UI inspired by Kryptonite design
+============================================================ */
+
 :root {
-    --accent: #6c63ff;
-    --bg-gradient: linear-gradient(135deg, #4e54c8, #8f94fb)
+    --primary: #0d1b2a;
+    --accent: #5bc0eb;
+    /* Modern light blue */
+    --bg: #f7f6f3;
+    --card-bg: #fff;
+    --error: #e74c3c;
+    --text: #111;
+    --muted: #6b7280;
+    --radius: 12px;
+    --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* Base Reset */
 * {
-    box-sizing: border-box
-}
-
-html,
-body {
-    height: 100%;
+    box-sizing: border-box;
     margin: 0;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-    background: var(--bg-gradient);
-    color: #0f1724
+    padding: 0;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
 }
 
-.auth-wrapper {
+body {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem
+    background: var(--bg);
+    color: var(--text);
 }
 
-.auth-card {
-    background: rgba(255, 255, 255, 0.98);
-    border-radius: 16px;
-    padding: 1.25rem;
-    max-width: 920px;
+/* ---------- AUTH CONTAINER ---------- */
+.auth-container {
     width: 100%;
-    box-shadow: 0 20px 60px rgba(10, 10, 40, 0.15);
-    display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 1rem;
-    align-items: center
+    max-width: 400px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    text-align: left;
+    transition: 0.3s ease;
 }
 
-.auth-info {
-    padding: 1rem
+.auth-container h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.3rem;
 }
 
-.auth-info h1 {
-    margin: 0 0 .5rem;
-    font-size: 1.4rem
+.auth-container p.subtitle {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
 }
 
-.auth-forms {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: .6rem
-}
-
-.auth-forms input {
-    padding: .6rem;
+/* ---------- FORM ELEMENTS ---------- */
+.auth-container input[type="email"],
+.auth-container input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    border: 1px solid #e6e9ef
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    transition: 0.2s ease;
 }
 
-.auth-forms button {
-    padding: .6rem;
-    border-radius: 8px;
-    border: 0;
+.auth-container input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(91, 192, 235, 0.25);
+}
+
+/* ---------- ERROR STATES ---------- */
+.input-error {
+    border-color: var(--error) !important;
+}
+
+.error-text {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: -0.8rem;
+    margin-bottom: 1rem;
+}
+
+/* ---------- BUTTONS ---------- */
+.auth-container button {
+    width: 100%;
     background: var(--accent);
     color: #fff;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 8px;
     font-weight: 600;
-    cursor: pointer
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
-@media(max-width:880px) {
-    .auth-card {
-        grid-template-columns: 1fr;
-    }
+.auth-container button:hover {
+    background: #3ba9d8;
+}
 
-    .auth-info {
-        order: 2
+/* Google button */
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #333;
+    font-weight: 500;
+}
+
+.google-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+/* ---------- FORM FOOTER ---------- */
+.auth-footer {
+    margin-top: 1.2rem;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.auth-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- CHECKBOX + FORGOT ---------- */
+.auth-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+    font-size: 0.85rem;
+}
+
+.auth-options label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+}
+
+.auth-options a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.auth-options a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 480px) {
+    .auth-container {
+        margin: 1rem;
+        padding: 1.5rem;
     }
+}
+/* ============================================================
+   🔑 Forgot Password Modal
+============================================================ */
+.forgot-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+.forgot-modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.forgot-modal-content h2 {
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+}
+
+.forgot-modal-content p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.modal-actions button {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.modal-actions button#sendReset {
+    background: var(--accent);
+    color: #fff;
+}
+
+.modal-actions button.secondary {
+    background: #e5e7eb;
+    color: #333;
+}
+
+.modal-actions button:hover {
+    opacity: 0.9;
 }

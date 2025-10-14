@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | History Timeline</title>
+    <link rel="stylesheet" href="auth.css" />
+</head>
+
+<body>
+    <div class="auth-container">
+        <h1>Create your account</h1>
+        <p class="subtitle">Join History Timeline and start building your story!</p>
+
+        <input type="email" id="regEmail" placeholder="Email address" required />
+        <input type="password" id="regPassword" placeholder="Password" required />
+        <button id="registerBtn">Sign up</button>
+
+        <button class="google-btn" id="googleSignup">
+            <img src="../assets/google-icon.svg" alt="Google"> Sign up with Google
+        </button>
+
+        <div class="auth-footer">
+            Already have an account? <a href="login.html">Login</a>
+        </div>
+
+        <p id="authMessage" class="message"></p>
+    </div>
+
+    <script type="module">
+        import { registerUser, loginWithGoogle } from "../src/js/auth.mjs";
+        import { auth } from "../src/js/firebase-config.mjs";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+        const regEmail = document.getElementById("regEmail");
+        const regPassword = document.getElementById("regPassword");
+        const registerBtn = document.getElementById("registerBtn");
+        const googleBtn = document.getElementById("googleSignup");
+        const message = document.getElementById("authMessage");
+
+        // --- Register with Email/Password ---
+        registerBtn.addEventListener("click", async () => {
+            const email = regEmail.value.trim();
+            const password = regPassword.value.trim();
+            if (!email || !password) return (message.textContent = "Please fill all fields.");
+
+            try {
+                await registerUser(email, password);
+                message.textContent = "✅ Account created successfully! Redirecting...";
+                message.style.color = "green";
+                setTimeout(() => (window.location.href = "../index.html"), 1200);
+            } catch (err) {
+                message.textContent = "❌ " + err.message;
+                message.style.color = "red";
+            }
+        });
+
+        // --- Google Sign-Up ---
+        googleBtn.addEventListener("click", async () => {
+            try {
+                await loginWithGoogle();
+                message.textContent = "✅ Signed in with Google!";
+                setTimeout(() => (window.location.href = "../index.html"), 1000);
+            } catch (err) {
+                message.textContent = "❌ " + err.message;
+            }
+        });
+
+        // --- Redirect if already signed in ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) window.location.href = "../index.html";
+        });
+    </script>
+</body>
+
+</html>

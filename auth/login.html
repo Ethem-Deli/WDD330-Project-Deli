@@ -4,67 +4,115 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login / Register | History Timeline</title>
+    <title>Login | History Timeline</title>
     <link rel="stylesheet" href="auth.css" />
 </head>
 
 <body>
-    <main class="auth-container">
-        <h2 id="authTitle">Login</h2>
+    <div class="auth-container">
+        <h1>Welcome back</h1>
+        <p class="subtitle">Please enter your details</p>
 
-        <input type="email" id="email" placeholder="Email" required />
+        <input type="email" id="email" placeholder="Email address" required />
+        <div class="error-text" id="emailError"></div>
+
         <input type="password" id="password" placeholder="Password" required />
-        <button id="authBtn">Login</button>
+        <div class="error-text" id="passwordError"></div>
 
-        <p id="toggleText">
-            Don’t have an account?
-            <a href="#" id="toggleMode">Register</a>
-        </p>
+        <div class="auth-options">
+            <label><input type="checkbox" id="rememberMe" /> Remember for 30 days</label>
+            <a href="#" id="forgotLink">Forgot password?</a>
+        </div>
 
-        <p id="authMessage" class="message"></p>
-    </main>
+        <button id="loginBtn">Sign in</button>
+
+        <button class="google-btn" id="googleLogin">
+            <img src="../public/assets/google-icon.svg" alt="Google"> Sign in with Google
+        </button>
+
+        <div class="auth-footer">
+            Don’t have an account? <a href="register.html">Sign up</a>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotModal" class="forgot-modal">
+        <div class="forgot-modal-content">
+            <h2>Reset Password</h2>
+            <p>Enter your email to receive a password reset link.</p>
+            <input type="email" id="resetEmail" placeholder="Email address" />
+            <div class="modal-actions">
+                <button id="sendReset">Send Link</button>
+                <button id="cancelReset" class="secondary">Cancel</button>
+            </div>
+            <p id="resetMessage"></p>
+        </div>
+    </div>
 
     <script type="module">
-        import { loginUser, registerUser, observeAuthState } from "./auth.js";
+        import { loginUser, loginWithGoogle } from "../src/js/auth.mjs";
+        import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+        import { auth } from "../src/js/firebase-config.mjs";
 
-        let mode = "login";
         const emailInput = document.getElementById("email");
         const passwordInput = document.getElementById("password");
-        const authBtn = document.getElementById("authBtn");
-        const message = document.getElementById("authMessage");
-        const toggle = document.getElementById("toggleMode");
-        const title = document.getElementById("authTitle");
+        const loginBtn = document.getElementById("loginBtn");
+        const googleBtn = document.getElementById("googleLogin");
+        const forgotLink = document.getElementById("forgotLink");
 
-        toggle.addEventListener("click", e => {
-            e.preventDefault();
-            mode = mode === "login" ? "register" : "login";
-            title.textContent = mode === "login" ? "Login" : "Register";
-            authBtn.textContent = mode === "login" ? "Login" : "Register";
-            toggle.textContent = mode === "login" ? "Register" : "Login";
-            message.textContent = "";
-        });
+        const modal = document.getElementById("forgotModal");
+        const sendReset = document.getElementById("sendReset");
+        const cancelReset = document.getElementById("cancelReset");
+        const resetEmail = document.getElementById("resetEmail");
+        const resetMessage = document.getElementById("resetMessage");
 
-        authBtn.addEventListener("click", async () => {
+        loginBtn.addEventListener("click", async () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            if (!email || !password) return (message.textContent = "Please fill in all fields.");
+            if (!email || !password) return alert("Please fill all fields");
 
             try {
-                if (mode === "login") {
-                    await loginUser(email, password);
-                    localStorage.setItem("currentUser", email);
-                    window.location.href = "../index.html";
-                } else {
-                    await registerUser(email, password);
-                    message.textContent = "Registration successful! Please log in.";
-                }
+                await loginUser(email, password);
+                localStorage.setItem("currentUser", email);
+                window.location.href = "../index.html";
             } catch (err) {
-                message.textContent = err.message;
+                alert("Login failed: " + err.message);
             }
         });
 
-        observeAuthState(user => {
-            if (user) window.location.href = "../index.html";
+        googleBtn.addEventListener("click", async () => {
+            try {
+                await loginWithGoogle();
+                window.location.href = "../index.html";
+            } catch (err) {
+                alert("Google login failed: " + err.message);
+            }
+        });
+
+        // --- Forgot password modal handling ---
+        forgotLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            modal.style.display = "flex";
+        });
+
+        cancelReset.addEventListener("click", () => {
+            modal.style.display = "none";
+            resetEmail.value = "";
+            resetMessage.textContent = "";
+        });
+
+        sendReset.addEventListener("click", async () => {
+            const email = resetEmail.value.trim();
+            if (!email) return (resetMessage.textContent = "Please enter your email.");
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                resetMessage.textContent = "✅ Reset link sent to your email.";
+                resetMessage.style.color = "green";
+            } catch (err) {
+                resetMessage.textContent = "❌ " + err.message;
+                resetMessage.style.color = "red";
+            }
         });
     </script>
 </body>

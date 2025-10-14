@@ -143,5 +143,20 @@ function renderEventCard(event) {
     </div>
   `;
 }
+favoriteBtn.addEventListener("click", async () => {
+  const favs = await getFavoritesForCurrentUser();
+  const exists = favs.find(f => f.id === event.id);
+  let updated;
+
+  if (exists) {
+    updated = favs.filter(f => f.id !== event.id);
+    showToast("❌ Removed from favorites");
+  } else {
+    updated = [...favs, event];
+    showToast("⭐ Added to favorites");
+  }
+
+  await saveFavoritesForCurrentUser(updated);
+});
 
 export { renderEventCard, displayEvents };
