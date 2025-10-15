@@ -1,3 +1,4 @@
+// src/js/headerAuth.js
 import { observeAuthState, logoutUser } from "./auth.mjs";
 
 document.addEventListener("DOMContentLoaded", () => {

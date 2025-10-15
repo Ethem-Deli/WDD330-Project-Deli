@@ -138,6 +138,7 @@ async function openModal(eventData) {
   if (modalFooter) modalFooter.innerHTML = "";
 
   modal.style.display = "block";
+  modal.classList.remove("closing");
 
   try {
     if (
@@ -214,30 +215,41 @@ async function openModal(eventData) {
     });
   }
 }
+//  Modal Close
 
-/* -------------------------
-   Modal Close
---------------------------*/
 function closeModal() {
   const modal = document.getElementById("eventModal");
-  if (modal) modal.style.display = "none";
+  if (!modal) return;
+  modal.classList.add("closing");
+  setTimeout(() => {
+    modal.style.display = "none";
+    modal.classList.remove("closing");
+  }, 200);
 }
 
 function setupModalClose() {
   const modal = document.getElementById("eventModal");
-  const closeBtn = document.querySelector(".close");
-
   if (!modal) return;
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
 
+  // ✅ Delegate clicks inside modal
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
+    // Close when clicking on close button or background
+    if (e.target.classList.contains("close") || e.target === modal) {
+      closeModal();
+    }
   });
 
+  // ✅ Close when pressing ESC
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeModal();
+    if (e.key === "Escape" && modal.style.display === "block") {
+      closeModal();
+    }
   });
 }
+
+// Ensure modal close is wired after DOM load
+window.addEventListener("load", setupModalClose);
+
 
 /* -------------------------
    Filters (No Blink Fix)
@@ -339,8 +351,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadSharedFavoritesFromQuery();
 
   try {
-    const localRes = await fetch("data/events.json");
-    const localEvents = await localRes.json();
+    // ✅ Load local JSON (works locally & GitHub Pages)
+    let localEvents = [];
+    try {
+      const base = window.location.origin.includes("github.io")
+        ? `${window.location.pathname.replace(/\/[^/]*$/, "")}/data/events.json`
+        : "data/events.json";
+      const localRes = await fetch(base);
+      localEvents = await localRes.json();
+
+      // Ensure image path is local
+      localEvents = localEvents.map((e) => ({
+        ...e,
+        image: e.image?.startsWith("http") ? e.image : `images/${e.image}`,
+      }));
+    } catch (err) {
+      console.warn("Local events load failed:", err);
+      localEvents = [];
+    }
 
     let apiEvents = [];
     try {

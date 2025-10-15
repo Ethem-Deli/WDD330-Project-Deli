@@ -5,7 +5,5 @@ node_modules
 .env
 .vscode
 src/js/config.js
-
-
 # Firebase private config
 src/js/firebase-config.js

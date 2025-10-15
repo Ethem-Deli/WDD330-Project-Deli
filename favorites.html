@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>My Timeline (Favorites) — History Timeline</title>
     <link rel="stylesheet" href="./src/css/styles.css" />
+
     <script type="module">
         import { requireAuth } from "./auth/auth.js";
         requireAuth("auth/login.html");
@@ -17,19 +18,18 @@
     <header id="header-placeholder"></header>
 
     <main class="favorites-page container">
-        <h1>My Timeline — Saved Events</h1>
+        <h1>My Timeline — Favorite Events</h1>
 
         <div class="favorites-actions">
             <button id="exportFavoritesBtn">📦 Export Favorites</button>
             <button id="shareFavoritesBtn">🔗 Share Favorites</button>
         </div>
 
-        <section id="favoritesTimeline" class="timeline-container">
-            <div id="fav-empty" style="display:none; padding:2rem;">
-                <p>No saved events yet. Browse the <a href="./index.html">timeline</a> and save events you like.</p>
-            </div>
-            <div id="favoritesList" class="timeline-list"></div>
-        </section>
+        <section id="favoritesContainer" class="favorites-grid mt-6"></section>
+
+        <div id="fav-empty" style="display:none; padding:2rem;">
+            <p>No saved events yet. Browse the <a href="./index.html">timeline</a> and save events you like.</p>
+        </div>
     </main>
 
     <!-- Event Modal -->
@@ -49,10 +49,13 @@
     <!-- Toast Notification -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Modules -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk" async
-        defer></script>
-    <script type="module" src="./src/js/favorites-page.mjs"></script>
+    <!-- Google Maps -->
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk&loading=async">
+        </script>
+
+    <!-- Page module -->
+    <script type="module" src="/src/js/favorites-page.mjs"></script>
 </body>
 
 </html>

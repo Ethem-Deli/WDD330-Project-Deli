@@ -304,6 +304,7 @@ header .logo img {
     overflow: visible;
     height: auto;
 }
+
 #timeline,
 .site-main {
     height: auto;
@@ -313,6 +314,7 @@ header .logo img {
     overflow-y: visible;
     /* ✅ allows scrolling */
 }
+
 /* --- Ensure timeline grid shows all rows --- */
 #timeline {
     height: auto !important;
@@ -1125,8 +1127,19 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
 }
+
 .event-card {
     flex-grow: 1;
     height: auto;
     max-height: none;
+}
+
+/* Modal fade effect */
+#eventModal {
+    transition: opacity 0.2s ease;
+    opacity: 1;
+}
+
+#eventModal.closing {
+    opacity: 0;
 }
