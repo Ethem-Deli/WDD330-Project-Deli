@@ -15,6 +15,7 @@ import { showToast } from "./js/toast.mjs";
 import { initSearchFilter } from "./modules/timeline.js";
 import { GOOGLE_MAPS_API_KEY } from "./js/config.js";
 
+
 window.showToast = showToast;
 
 let allEvents = [];
@@ -280,28 +281,24 @@ function setupFilters(events) {
 --------------------------*/
 async function toggleFavoriteForEvent(eventData) {
   try {
-    const favs = await getFavoritesForCurrentUser();
-    const exists = favs.find((f) => f && f.id === eventData.id);
-    const button = document.querySelector(
-      `.event-card[data-id="${eventData.id}"] .favorite-btn`
-    );
+    let favs = getFavoritesForCurrentUser();
+    const exists = favs.some((f) => f.id === eventData.id);
+    const btn = document.querySelector(`.event-card[data-id="${eventData.id}"] .favorite-btn`);
 
     if (exists) {
-      const updated = favs.filter((f) => f && f.id !== eventData.id);
-      await saveFavoritesForCurrentUser(updated);
-      button?.classList.remove("active");
+      favs = favs.filter((f) => f.id !== eventData.id);
+      btn?.classList.remove("active");
       showToast("❌ Removed from favorites", "error");
     } else {
       favs.push(eventData);
-      await saveFavoritesForCurrentUser(favs);
-      button?.classList.add("active");
+      btn?.classList.add("active");
       showToast("✅ Added to favorites", "success");
     }
 
-    await renderFavoritesUI();
+    await saveFavoritesForCurrentUser(favs);
   } catch (err) {
-    console.error("toggleFavorite error", err);
-    showToast("⚠️ Failed toggling favorite", "error");
+    console.error(err);
+    showToast("⚠️ Failed to toggle favorite", "error");
   }
 }
 

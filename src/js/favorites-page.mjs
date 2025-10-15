@@ -1,143 +1,146 @@
-// src/js/favorites-page.mjs
-import { loadTemplateWithFallback } from "./main-fallback.mjs";
 import {
     getFavoritesForCurrentUser,
     saveFavoritesForCurrentUser,
     exportFavoritesAsFile,
     createShareLink,
-    loadSharedFavoritesFromQuery,
 } from "./favorites.mjs";
-import { renderEventCard } from "./timeline-utils.mjs";
-import { shareEventById } from "./share.mjs";
+import { showToast } from "./toast.mjs";
 
-// 🧭 Toast Notification Utility
-function showToast(message, type = "info") {
-    let container = document.getElementById("toastContainer");
-    if (!container) {
-        container = document.createElement("div");
-        container.id = "toastContainer";
-        container.className = "toast-container";
-        document.body.appendChild(container);
+document.addEventListener("DOMContentLoaded", async () => {
+    await renderFavorites();
+    setupModalClose();
+});
+
+/* -----------------------------------------
+   🧭 Render favorite cards
+------------------------------------------ */
+async function renderFavorites() {
+    const container = document.getElementById("favoritesList");
+    if (!container) return;
+
+    let favs = await getFavoritesForCurrentUser();
+    if (!Array.isArray(favs)) favs = [];
+
+    if (favs.length === 0) {
+        container.innerHTML = `
+      <p class="no-favorites">No favorites yet ❤️</p>
+    `;
+        return;
     }
 
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    container.appendChild(toast);
+    container.innerHTML = favs
+        .map(
+            (e) => `
+      <div class="event-card" data-id="${e.id}">
+        <img src="${e.image}" alt="${e.title}">
+        <div class="event-info">
+          <h3>${e.title}</h3>
+          <p>${(e.description || "").slice(0, 80)}...</p>
+          <button class="remove-fav-btn">💔 Remove</button>
+        </div>
+      </div>
+    `
+        )
+        .join("");
 
-    requestAnimationFrame(() => toast.classList.add("show"));
-
-    setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => toast.remove(), 400);
-    }, 3000);
+    attachEventListeners(favs);
 }
 
-// 🧭 Initialize Page
-(async () => {
-    await loadTemplateWithFallback("/src/partials/header.html", "#header-placeholder");
-    await loadTemplateWithFallback("/src/partials/footer.html", "#footer-placeholder");
+/* -----------------------------------------
+   🧩 Attach remove, open, export, share
+------------------------------------------ */
+function attachEventListeners(favs) {
+    // ✅ Remove from favorites
+    document.querySelectorAll(".remove-fav-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            const card = btn.closest(".event-card");
+            if (!card) return;
+            const eventId = Number(card.dataset.id);
 
-    const favoritesContainer = document.getElementById("favoritesContainer");
-    const exportBtn = document.getElementById("exportFavoritesBtn");
-    const shareBtn = document.getElementById("shareFavoritesBtn");
-
-    // 🧩 Load favorites from query or local storage
-    let favorites = await loadSharedFavoritesFromQuery();
-    if (!favorites || favorites.length === 0) {
-        favorites = getFavoritesForCurrentUser();
-    }
-
-    // ✅ Always ensure favorites is an array
-    if (!Array.isArray(favorites)) {
-        try {
-            favorites = JSON.parse(favorites);
-            if (!Array.isArray(favorites)) favorites = [];
-        } catch {
-            favorites = [];
-        }
-    }
-
-    function renderFavoritesList() {
-        favoritesContainer.innerHTML = "";
-
-        if (favorites.length === 0) {
-            favoritesContainer.innerHTML = `<p class="text-gray-500 text-center mt-6">No favorites added yet.</p>`;
-            return;
-        }
-
-        favorites.forEach((event) => {
-            const card = renderEventCard(event, true);
-            favoritesContainer.appendChild(card);
+            const updatedFavs = favs.filter((f) => f.id !== eventId);
+            await saveFavoritesForCurrentUser(updatedFavs);
+            showToast("❌ Removed from favorites", "error");
+            await renderFavorites(); // instantly refresh
         });
-    }
-
-    renderFavoritesList();
-
-    // 🎁 Export button
-    exportBtn?.addEventListener("click", () => {
-        exportFavoritesAsFile();
-        showToast("Favorites exported successfully!", "success");
     });
 
-    // 🔗 Share button
-    shareBtn?.addEventListener("click", async () => {
-        await createShareLink();
-        showToast("Share link copied to clipboard!", "info");
+    // ✅ Open modal
+    document.querySelectorAll(".event-card").forEach((card) => {
+        card.addEventListener("click", (e) => {
+            if (e.target.closest(".remove-fav-btn")) return;
+            const id = Number(card.dataset.id);
+            const eventData = favs.find((f) => f.id === id);
+            if (eventData) openModal(eventData);
+        });
     });
 
-    // ♻️ Handle remove/share actions on cards
-    favoritesContainer.addEventListener("click", async (e) => {
-        const card = e.target.closest(".event-card");
-        if (!card) return;
-
-        const eventId = card.dataset.eventId;
-        const eventData = favorites.find((f) => f.id == eventId);
-
-        if (e.target.closest("[data-action='share']")) {
-            await shareEventById(eventId);
-            return;
-        }
-
-        if (e.target.closest("[data-action='favorite']")) {
-            favorites = favorites.filter((f) => f.id != eventId);
-            saveFavoritesForCurrentUser(favorites);
-            renderFavoritesList();
-            showToast("Removed from favorites ❌", "error");
-            return;
-        }
-
-        openEventModal(eventData);
+    // ✅ Export
+    document.getElementById("exportFavsBtn")?.addEventListener("click", () => {
+        exportFavoritesAsFile(favs);
+        showToast("✅ Favorites exported!", "success");
     });
-})();
 
-// 🗺️ Modal + Google Map setup
-function openEventModal(eventData) {
+    // ✅ Share
+    document.getElementById("shareFavsBtn")?.addEventListener("click", async () => {
+        await createShareLink(favs);
+        showToast("📋 Share link copied to clipboard!", "success");
+    });
+}
+
+/* -----------------------------------------
+   🗺️ Modal logic
+------------------------------------------ */
+function openModal(eventData) {
     const modal = document.getElementById("eventModal");
     if (!modal) return;
 
-    document.getElementById("modalTitle").textContent = eventData.title || "Untitled Event";
+    document.getElementById("modalTitle").textContent = eventData.title || "";
     document.getElementById("modalDescription").textContent =
         eventData.description || "No description available.";
     document.getElementById("modalImage").src =
         eventData.image || "./src/assets/placeholder.png";
 
-    modal.classList.remove("hidden");
+    const mapContainer = document.getElementById("modalMap");
+    mapContainer.innerHTML = "";
 
-    setTimeout(() => {
-        const mapContainer = document.getElementById("modalMap");
-        if (window.google && eventData.lat && eventData.lng) {
-            const map = new google.maps.Map(mapContainer, {
-                center: { lat: eventData.lat, lng: eventData.lng },
-                zoom: 5,
-            });
-            new google.maps.Marker({
-                position: { lat: eventData.lat, lng: eventData.lng },
-                map,
-                title: eventData.title,
-            });
-        } else {
-            mapContainer.innerHTML = "<p>Location not available.</p>";
-        }
-    }, 400);
+    if (window.google && eventData.lat && eventData.lng) {
+        const map = new google.maps.Map(mapContainer, {
+            center: { lat: eventData.lat, lng: eventData.lng },
+            zoom: 5,
+        });
+        new google.maps.Marker({
+            position: { lat: eventData.lat, lng: eventData.lng },
+            map,
+            title: eventData.title,
+        });
+    } else {
+        mapContainer.innerHTML = "<p>Location not available.</p>";
+    }
+
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
+}
+
+/* -----------------------------------------
+   🧭 Close modal logic
+------------------------------------------ */
+function setupModalClose() {
+    const modal = document.getElementById("eventModal");
+    const close = document.getElementById("closeModal");
+
+    close?.addEventListener("click", closeModal);
+    modal?.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+    });
+}
+
+function closeModal() {
+    const modal = document.getElementById("eventModal");
+    if (!modal) return;
+    modal.style.display = "none";
+    modal.classList.add("hidden");
 }

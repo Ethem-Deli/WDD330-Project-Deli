@@ -1,0 +1,325 @@
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: #fafafa;
+    margin: 0;
+    color: #222;
+}
+
+main.favorites-page {
+    padding: 2rem;
+}
+
+.fav-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn-small {
+    background: #1976d2;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.btn-small:hover {
+    background: #0d47a1;
+}
+
+.favorites-list {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.event-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s;
+}
+
+.event-card:hover {
+    transform: translateY(-3px);
+}
+
+.event-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.event-info {
+    padding: 1rem;
+}
+
+.remove-fav-btn {
+    margin-top: 0.5rem;
+    background: #ff5252;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+}
+
+.remove-fav-btn:hover {
+    background: #d32f2f;
+}
+
+/* 🧭 Modal Styles */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: white;
+    max-width: 600px;
+    width: 100%;
+    border-radius: 10px;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    animation: popIn 0.3s ease;
+}
+
+.modal-content img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.modal-content h2 {
+    margin: 0.5rem 0;
+    font-size: 1.5rem;
+}
+
+.modal-content p {
+    color: #444;
+    line-height: 1.5;
+}
+
+#modalMap {
+    width: 100%;
+    height: 250px;
+    margin-top: 1rem;
+    border-radius: 8px;
+    background: #f0f0f0;
+}
+
+.close {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.close:hover {
+    color: #000;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+body {
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    background: #f6f7fb;
+    color: #222;
+}
+
+/* Header */
+.site-header {
+    background: #1a1a1a;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+}
+
+.site-header .logo {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.site-header nav a {
+    color: #ddd;
+    text-decoration: none;
+    margin-left: 1rem;
+}
+
+.site-header nav a.active,
+.site-header nav a:hover {
+    color: #fff;
+    border-bottom: 2px solid #fff;
+}
+
+/* Footer */
+.site-footer {
+    background: #1a1a1a;
+    color: #ccc;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+}
+
+/* Page */
+.favorites-page {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+.favorites-page h1 {
+    margin-bottom: 1rem;
+}
+
+/* Action Buttons */
+.fav-actions {
+    margin-bottom: 2rem;
+}
+
+.fav-actions .btn-small {
+    background: #0078ff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin: 0 0.3rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.fav-actions .btn-small:hover {
+    background: #005fcc;
+}
+
+/* Favorites List */
+.favorites-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    justify-content: center;
+}
+
+.event-card.small {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.event-card.small:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.event-image-small {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+}
+
+.event-card.small .card-body {
+    padding: 0.5rem 1rem 1rem;
+}
+
+.event-card.small h4 {
+    margin: 0.3rem 0 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.no-results {
+    text-align: center;
+    color: #777;
+}
+
+.remove-fav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    margin-top: 0.3rem;
+    color: #ff5555;
+    transition: transform 0.2s;
+}
+
+.remove-fav-btn:hover {
+    transform: scale(1.2);
+}
+
+.event-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.event-card:hover {
+    transform: translateY(-4px);
+}
+
+.event-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.event-info {
+    padding: 0.75rem 1rem;
+}
+
+.remove-fav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #e74c3c;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 0.3rem;
+    transition: transform 0.2s ease;
+}
+
+.remove-fav-btn:hover {
+    transform: scale(1.15);
+}
+
+.no-favorites {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #777;
+    margin-top: 2rem;
+}

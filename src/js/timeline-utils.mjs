@@ -238,8 +238,9 @@ async function showEventLocationOnMap(event, mapEl) {
 export function renderEventCard(event, isFavoritePage = false) {
   const card = document.createElement("div");
   card.className = "event-card";
-  card.dataset.id = event.id;
+  card.dataset.eventId = event.id;
 
+  // Build inner HTML
   card.innerHTML = `
     <img src="${event.image || ""}" alt="${event.title || "Event"}" style="max-width:100%; border-radius:12px;">
     <div class="event-info">
@@ -247,32 +248,47 @@ export function renderEventCard(event, isFavoritePage = false) {
       <p><strong>Year:</strong> ${event.year || event.date || ""}</p>
       <p>${event.description || ""}</p>
       <p><em>${event.location?.name || event.location || ""}</em></p>
-      ${!isFavoritePage ? `<button class="favorite-btn" data-id="${event.id}">⭐ Add to Favorites</button>` : ""}
+      <div class="event-actions">
+        <button class="action-btn" data-action="share" title="Share">🔗</button>
+        <button class="action-btn favorite-btn" data-action="favorite" data-id="${event.id}" title="Add/Remove favorite">
+          ❤️
+        </button>
+      </div>
     </div>
   `;
 
-  // Only attach event listeners if on main timeline
-  if (!isFavoritePage) {
-    const btn = card.querySelector(".favorite-btn");
-    btn.addEventListener("click", () => {
-      const storedUser = sessionStorage.getItem("currentUser");
-      if (!storedUser) {
-        alert("Please log in to save favorites.");
-        return;
-      }
-
-      const userFavorites = JSON.parse(localStorage.getItem(`favorites_${storedUser}`)) || [];
-      const exists = userFavorites.some((fav) => fav.id === event.id);
-
-      if (!exists) {
-        userFavorites.push(event);
-        localStorage.setItem(`favorites_${storedUser}`, JSON.stringify(userFavorites));
-        alert("Added to favorites!");
-      } else {
-        alert("Already in favorites!");
-      }
-    });
+  // Set up favorite button state based on stored favorites
+  const favBtn = card.querySelector(".favorite-btn");
+  try {
+    const userFavs = getFavoritesForCurrentUser() || [];
+    const exists = userFavs.some((f) => f.id === event.id);
+    if (exists) favBtn.classList.add("is-favorited");
+  } catch (e) {
+    // ignore
   }
+
+  // Toggle favorite on click (works both on timeline and favorites page)
+  favBtn.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    let favs = getFavoritesForCurrentUser() || [];
+    const idx = favs.findIndex((f) => f.id === event.id);
+    if (idx === -1) {
+      // add
+      favs.push(event);
+      favBtn.classList.add("is-favorited");
+      showToast && showToast("Added to favorites ⭐", "success");
+    } else {
+      // remove
+      favs.splice(idx, 1);
+      favBtn.classList.remove("is-favorited");
+      showToast && showToast("Removed from favorites ❌", "error");
+      // If we're on the favorites page, remove the card immediately
+      if (isFavoritePage) {
+        card.remove();
+      }
+    }
+    saveFavoritesForCurrentUser(favs);
+  });
 
   return card;
 }

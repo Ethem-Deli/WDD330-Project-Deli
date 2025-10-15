@@ -1,61 +1,69 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>My Timeline (Favorites) — History Timeline</title>
-    <link rel="stylesheet" href="./src/css/styles.css" />
-
-    <script type="module">
-        import { requireAuth } from "./auth/auth.js";
-        requireAuth("auth/login.html");
-    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Timeline — Favorites</title>
+    <link rel="stylesheet" href="src/css/favorites.css" />
+    <link rel="stylesheet" href="src/css/modal.css" />
+    <script type="module" src="src/js/favorites-page.mjs"></script>
 </head>
 
 <body>
-    <!-- HEADER -->
-    <header id="header-placeholder"></header>
+    <!-- 🌐 Static Header -->
+    <header class="site-header">
+        <div class="logo">📜 My Timeline</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="favorites.html" class="active">Favorites</a>
+        </nav>
+    </header>
 
-    <main class="favorites-page container">
-        <h1>My Timeline — Favorite Events</h1>
+    <!-- 💖 Main Content -->
+    <main class="favorites-page">
+        <h1>My Favorite Events</h1>
 
-        <div class="favorites-actions">
-            <button id="exportFavoritesBtn">📦 Export Favorites</button>
-            <button id="shareFavoritesBtn">🔗 Share Favorites</button>
+        <div class="fav-actions">
+            <button id="exportFavsBtn" class="btn-small">⬇️ Export Favorites</button>
+            <button id="shareFavsBtn" class="btn-small">🔗 Share Favorites</button>
         </div>
 
-        <section id="favoritesContainer" class="favorites-grid mt-6"></section>
-
-        <div id="fav-empty" style="display:none; padding:2rem;">
-            <p>No saved events yet. Browse the <a href="./index.html">timeline</a> and save events you like.</p>
+        <div id="favoritesList" class="favorites-list">
+            <!-- Favorites will be dynamically loaded here -->
         </div>
     </main>
 
-    <!-- Event Modal -->
+    <!-- 🧭 Modal -->
     <div id="eventModal" class="modal hidden">
         <div class="modal-content">
-            <span id="closeModal" class="close">&times;</span>
+            <span class="close" id="closeModal">&times;</span>
+            <img id="modalImage" src="" alt="Event Image" />
             <h2 id="modalTitle"></h2>
             <p id="modalDescription"></p>
-            <img id="modalImage" alt="Event image" style="max-width:100%;border-radius:8px;">
-            <div id="modalMap" style="width:100%;height:300px;margin-top:10px;border-radius:8px;"></div>
-            <div id="modalFooter" class="modal-footer"></div>
+            <div id="modalMap"></div>
+            <div id="modalFooter"></div>
         </div>
     </div>
 
-    <div id="footer-placeholder"></div>
-
-    <!-- Toast Notification -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- Google Maps -->
-    <script async
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk&loading=async">
-        </script>
-
-    <!-- Page module -->
-    <script type="module" src="/src/js/favorites-page.mjs"></script>
+    <!-- ⚓ Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-left">
+                    <p>© <span id="yearNow"></span> History Timeline — Interactive World History</p>
+                    <p>Project by <strong>Ethem Deli</strong> — WDD 330</p>
+                </div>
+                <div class="footer-right">
+                    <nav class="footer-nav">
+                        <a href="./privacy.html">Privacy</a>
+                        <a href="./terms.html">Terms</a>
+                        <a href="mailto:edeli@byupathway.edu">Contact</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>
