@@ -1,35 +1,35 @@
-// ============================
-// 🔐 Firebase + Local Fallback Auth
-// ============================
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import {
     getAuth,
     onAuthStateChanged,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signOut
+    signOut,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-// ============================
-// 🔧 Firebase Configuration
-// ============================
-const firebaseConfig = {
-    apiKey: "AIzaSyB92OXlJn50jta9IHuY5czC937HMgYH2xs",
-    authDomain: "historytimeline-wdd330.firebaseapp.com",
-    projectId: "historytimeline-wdd330",
-    storageBucket: "historytimeline-wdd330.firebasestorage.app",
-    messagingSenderId: "539673015003",
-    appId: "1:539673015003:web:2621f434393950b78312fe",
-    measurementId: "G-GV6LHVLN1R"
-};
+import { FIREBASE_CONFIG } from "../src/js/firebase-config.js"; // import from local config (not committed)
 
-const app = initializeApp(firebaseConfig);
+// 🔧 Firebase Initialization
+
+// 🧠 Check for placeholder config
+const requiredKeys = ["apiKey", "authDomain", "projectId", "appId"];
+const missing = requiredKeys.filter(
+    (k) => !FIREBASE_CONFIG[k] || FIREBASE_CONFIG[k].includes("YOUR_")
+);
+if (missing.length > 0) {
+    console.error(
+        `⚠️ Firebase config missing required keys: ${missing.join(", ")}`
+    );
+    console.warn(
+        "Please copy src/js/firebase-config.example.js → src/js/firebase-config.js and fill in your Firebase credentials."
+    );
+}
+
+// Initialize Firebase app
+const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
 
-// ============================
 // 🧩 Firebase Auth Helpers
-// ============================
 
 // 🔹 Login existing user
 export async function loginUser(email, password) {
@@ -79,14 +79,20 @@ export function requireAuth(redirectTo = "login.html") {
 
 export { auth };
 
-// ============================
 // 💾 Local Fallback (Offline Mode)
-// ============================
-function _localUsersKey() { return "local_users_v1"; }
-function _getLocalUsers() {
-    try { return JSON.parse(localStorage.getItem(_localUsersKey()) || "[]"); } catch (e) { return []; }
+function _localUsersKey() {
+    return "local_users_v1";
 }
-function _saveLocalUsers(users) { localStorage.setItem(_localUsersKey(), JSON.stringify(users)); }
+function _getLocalUsers() {
+    try {
+        return JSON.parse(localStorage.getItem(_localUsersKey()) || "[]");
+    } catch (e) {
+        return [];
+    }
+}
+function _saveLocalUsers(users) {
+    localStorage.setItem(_localUsersKey(), JSON.stringify(users));
+}
 
 async function tryServer(url, payload) {
     try {
@@ -104,9 +110,7 @@ async function tryServer(url, payload) {
     }
 }
 
-// ============================
 // 🧾 Form Handling (optional for auth.html)
-// ============================
 const registerForm = document.getElementById("registerForm");
 const loginForm = document.getElementById("loginForm");
 
@@ -118,7 +122,11 @@ if (registerForm) {
         const email = document.getElementById("registerEmail").value.trim();
         const password = document.getElementById("registerPassword").value;
 
-        const serverData = await tryServer("/api/auth/register", { name, email, password });
+        const serverData = await tryServer("/api/auth/register", {
+            name,
+            email,
+            password,
+        });
         if (serverData) {
             alert("Registered (server)");
             window.location.href = "/index.html";
@@ -126,7 +134,7 @@ if (registerForm) {
         }
 
         const users = _getLocalUsers();
-        if (users.find(u => u.email === email)) {
+        if (users.find((u) => u.email === email)) {
             alert("Email already registered (local)");
             return;
         }
@@ -155,13 +163,18 @@ if (loginForm) {
         }
 
         const users = _getLocalUsers();
-        const u = users.find(x => x.email === email && x.password === password);
+        const u = users.find(
+            (x) => x.email === email && x.password === password
+        );
         if (!u) {
             alert("Login failed (local)");
             return;
         }
 
-        localStorage.setItem("local_user", JSON.stringify({ name: u.name, email: u.email }));
+        localStorage.setItem(
+            "local_user",
+            JSON.stringify({ name: u.name, email: u.email })
+        );
         localStorage.setItem("currentUser", u.email);
         alert("Logged in (local)");
         window.location.href = "/index.html";

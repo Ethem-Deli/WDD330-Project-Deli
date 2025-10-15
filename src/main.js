@@ -13,11 +13,10 @@ import {
 import { initHamburgerMenu } from "./js/hamburger.mjs";
 import { showToast } from "./js/toast.mjs";
 import { initSearchFilter } from "./modules/timeline.js";
+import { GOOGLE_MAPS_API_KEY } from "./js/config.js";
 
 window.showToast = showToast;
 
-//  Google Maps API Key
-const GMAPS_KEY = "AIzaSyDLwMRu47yXHBbfX4cimCx9BnIEtdmd0zk";
 let allEvents = [];
 
 /* -------------------------
@@ -141,7 +140,16 @@ async function openModal(eventData) {
   modal.style.display = "block";
 
   try {
-    await ensureGoogleMaps(GMAPS_KEY);
+    if (
+      !GOOGLE_MAPS_API_KEY ||
+      GOOGLE_MAPS_API_KEY.includes("YOUR_GOOGLE_MAPS_KEY")
+    ) {
+      modalMap.innerHTML =
+        "<p>⚠️ Google Maps API key not set. Map cannot be displayed.</p>";
+      return;
+    }
+
+    await ensureGoogleMaps(GOOGLE_MAPS_API_KEY);
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
@@ -152,7 +160,7 @@ async function openModal(eventData) {
         const geoRes = await fetch(
           `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
             eventData.title
-          )}&key=${GMAPS_KEY}`
+          )}&key=${GOOGLE_MAPS_API_KEY}`
         );
         const geoJson = await geoRes.json();
         if (geoJson.status === "OK" && geoJson.results?.[0]) {
