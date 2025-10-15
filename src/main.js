@@ -352,8 +352,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     let localEvents = [];
     try {
       const base = window.location.origin.includes("github.io")
-        ? `${window.location.origin}/WDD330-Project-Deli/data/events.json`
-        : "./data/events.json";
+        ? `${window.location.origin}/WDD330-Project-Deli/public/data/events.json`
+        : "./public/data/events.json";
       const localRes = await fetch(base);
       localEvents = await localRes.json();
 
