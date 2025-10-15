@@ -348,33 +348,35 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadSharedFavoritesFromQuery();
 
   try {
-    // ✅ Load local JSON (works on local dev, Netlify, and GitHub Pages)
+    // ✅ Load local JSON (works locally & GitHub Pages)
+    // ✅ Load local JSON (works for local dev + Netlify + GitHub Pages)
     let localEvents = [];
     try {
       let basePath = "";
 
       if (window.location.origin.includes("github.io")) {
-        // GitHub Pages (repo name required)
-        basePath = `${window.location.origin}/WDD330-Project-Deli/data/events.json`;
+        // GitHub Pages: project is hosted under /WDD330-Project-Deli/
+        basePath = `${window.location.origin}/WDD330-Project-Deli/public/data/events.json`;
       } else {
-        // Local dev or Netlify
-        basePath = "/data/events.json";
+        // Local dev / Netlify build
+        basePath = "./public/data/events.json";
       }
 
+      console.log("Fetching events from:", basePath);
       const localRes = await fetch(basePath);
       if (!localRes.ok) throw new Error(`Failed to load: ${basePath}`);
 
       localEvents = await localRes.json();
 
-      // 🖼️ Ensure local image paths resolve properly
+      // Fix relative image paths
       localEvents = localEvents.map((e) => ({
         ...e,
-        image: e.image?.startsWith("http") ? e.image : `/images/${e.image}`,
+        image: e.image?.startsWith("http") ? e.image : `public/images/${e.image}`,
       }));
 
       console.log("✅ Local events loaded:", localEvents.length);
     } catch (err) {
-      console.warn("⚠️ Local events load failed:", err);
+      console.error("⚠️ Local events load failed:", err);
       localEvents = [];
     }
 
