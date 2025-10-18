@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-    base: "/", // ✅ needed for GitHub Pages root site
+    base: "/WDD330-Project-Deli/", // GitHub Pages project site fixed
     publicDir: "public",
 
     server: {
