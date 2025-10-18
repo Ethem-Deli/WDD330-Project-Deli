@@ -355,11 +355,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       let basePath = "";
 
       if (window.location.origin.includes("github.io")) {
-        // GitHub Pages: fetch from the right relative path
-        basePath = `${window.location.origin}/WDD330-Project-Deli/data/events.json`;
+        basePath = `${window.location.origin}/WDD330-Project-Deli/public/data/events.json`;
       } else {
-        // Local dev
-        basePath = "./data/events.json";
+        basePath = "./public/data/events.json";
       }
 
       console.log("Fetching events from:", basePath);
@@ -368,12 +366,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       localEvents = await localRes.json();
 
-      // Fix relative image paths
       localEvents = localEvents.map((e) => ({
         ...e,
-        image: e.image?.startsWith("http") ? e.image : `./images/${e.image}`,
+        image: e.image?.startsWith("http") ? e.image : `./public/images/${e.image}`,
       }));
-
       console.log("✅ Local events loaded:", localEvents.length);
     } catch (err) {
       console.error("⚠️ Local events load failed:", err);
